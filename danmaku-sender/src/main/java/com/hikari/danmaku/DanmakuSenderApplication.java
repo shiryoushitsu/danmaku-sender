@@ -10,7 +10,8 @@ public class DanmakuSenderApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(DanmakuSenderApplication.class, args);
-        System.out.println("----------弹幕发射场启动成功----------");
+        System.out.println("--------弹幕发射场启动成功--------");
+        System.out.println("浏览器打开：http://localhost:8010");
     }
 
 }

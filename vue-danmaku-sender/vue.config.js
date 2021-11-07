@@ -7,7 +7,7 @@ module.exports = {
     // 当运行 vue-cli-service build 时生成的生产环境构建文件的目录。
     // 注意目标目录在构建之前会被清除 (构建时传入 --no-clean 可关闭该行为)。
     // 默认值'dist'
-    outputDir: "dist",
+    outputDir: "../danmaku-sender/src/main/resources/static",
     // 放置生成的静态资源 (js、css、img、fonts) 的目录(相对于outputDir目录)。
     // 默认值''
     assetsDir: "",
