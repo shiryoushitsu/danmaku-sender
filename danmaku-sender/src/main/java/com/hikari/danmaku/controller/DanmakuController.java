@@ -377,6 +377,7 @@ public class DanmakuController {
         filter.getExcludes().add("cookie");
         filter.getExcludes().add("csrf");
         filter.getExcludes().add("sendFirstDmTime");
+        filter.getExcludes().add("sendMode");
         String jsonResult = JSONObject.toJSONString(sendDanmakuM7Vo,filter);
 //        writer.append(sendDanmakuM7Vo.getEffectTem()+":\n");
         writer.append(jsonResult+"\n");

@@ -11,7 +11,7 @@ Vue.use(Element)
 Vue.use(VueAxios, axios)
 Vue.config.productionTip = false
 
-axios.defaults.baseURL = '/api'
+// axios.defaults.baseURL = '/api'
 
 new Vue({
   router,

@@ -46,7 +46,7 @@ public class DanmakuService implements IDanmakuService {
 
 
         // 根据bvid + pardId获取视频信息
-        if(StringUtils.isNotBlank(sendDanmakuM1Vo.getBvid())){
+        if(StringUtils.isBlank(sendDanmakuM1Vo.getBvid())){
             sendDanmakuM1Vo.setOid("无");
             sendDanmakuM1Vo.setVideoTitle("无");
             sendDanmakuM1Vo.setPartTitle("无");
@@ -107,7 +107,7 @@ public class DanmakuService implements IDanmakuService {
 //        }
 
         // 根据bvid + pardId获取视频信息
-        if(StringUtils.isNotBlank(sendDanmakuM7Vo.getBvid())){
+        if(StringUtils.isBlank(sendDanmakuM7Vo.getBvid())){
             sendDanmakuM7Vo.setOid("无");
             sendDanmakuM7Vo.setVideoTitle("无");
             sendDanmakuM7Vo.setPartTitle("无");

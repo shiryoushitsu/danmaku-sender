@@ -25,12 +25,12 @@
              <el-row>
           <el-col :span="12">
               <el-form-item size="middle" label="账号缓存值1" prop="cookie" label-width="100px">
-                    <el-input v-model="form.cookie"  placeholder="SESSDATA，相当于发送的弹幕的账号" maxlength="30" />
+                    <el-input v-model="form.cookie"  placeholder="SESSDATA，相当于发送的弹幕的账号"  />
                   </el-form-item>
           </el-col>
           <el-col :span="12">
                   <el-form-item size="middle" label="视频BV号" prop="bvid" label-width="100px">
-                    <el-input v-model="form.bvid"  placeholder="请输入视频BV号" maxlength="30" />
+                    <el-input v-model="form.bvid"  placeholder="请输入视频BV号"  />
                   </el-form-item>
           </el-col>
         </el-row>
@@ -38,7 +38,7 @@
         <el-row>
           <el-col :span="12">
                   <el-form-item size="middle" label="账号缓存值2" prop="csrf" label-width="100px" >
-                    <el-input v-model="form.csrf"  placeholder="bili_jct，用于发送接口账号校验" maxlength="30" />
+                    <el-input v-model="form.csrf"  placeholder="bili_jct，用于发送接口账号校验" />
                   </el-form-item>
           </el-col>
           <el-col :span="12">
