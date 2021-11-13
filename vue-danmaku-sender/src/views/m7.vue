@@ -581,7 +581,7 @@ export default {
               this.timerStatus = 0;
 
             }
-          }).catch(function (error) {
+          }).catch(error =>  {
             _this.stopSetInterval()
             
             console.log(error);
@@ -621,7 +621,7 @@ export default {
         if(res.data.code == 200){
             this.textarea = res.data.msg
         }
-      }).catch(function (error) {
+      }).catch(error =>  {
         console.log(error);
       });
     },
@@ -640,7 +640,7 @@ export default {
           this.textarea = res.data.data.txtLog
           // console.log(this.textarea);
         }
-      }).catch(function (error) {
+      }).catch(error =>  {
         this.stopSetInterval()
         console.log(error);
       });
@@ -659,7 +659,7 @@ export default {
             if(res.data.code == 200){
               this.textarea = res.data.data.txtLog
             }
-          }).catch(function (error) {
+          }).catch(error =>  {
             this.stopSetInterval()
             console.log(error);
           });
@@ -758,7 +758,7 @@ export default {
             if(res.data.code == 200){
               console.log(res.data)
             }
-          }).catch(function (error) {
+          }).catch(error =>  {
             console.log(error);
           });
           this.$message({
@@ -778,7 +778,7 @@ export default {
           this.form.csrf = res.data.data.csrf
           console.log(res.data)
         }
-      }).catch(function (error) {
+      }).catch(error =>  {
         console.log(error);
       });
     },
@@ -791,7 +791,7 @@ export default {
           this.effectOptions = res.data.data
           console.log(res.data)
         }
-      }).catch(function (error) {
+      }).catch(error =>  {
         console.log(error);
       });
     },

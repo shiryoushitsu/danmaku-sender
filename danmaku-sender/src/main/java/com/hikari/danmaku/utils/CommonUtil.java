@@ -15,12 +15,8 @@ import java.util.List;
 
 public  class CommonUtil {
     public static void main(String []args)  {
-        Random random =new Random();
-        System.out.println(random.nextInt( 1));
-        Long currentTimeMillis = System.currentTimeMillis();
-        String str = DateUtil.LongToTime(currentTimeMillis);
-        System.out.println(str);
-
+       String txt = "一二三层";
+        System.out.println(rowToColumn(txt));
     }
 
     //double保留2位小数
@@ -388,6 +384,23 @@ public  class CommonUtil {
         }
         IOUtils.closeQuietly(bin);
         return code;
+    }
+
+    public static String rowToColumn(String content){
+        int length = content.length();
+        String result = "";
+        List<String> strList = new ArrayList<>();
+        for (int i = 0;i < length;i++) {
+            String word = String.valueOf(content.charAt(i));
+            if(i < length -1){
+                result = result + word +"\\n";
+            }else {
+                result = result + word;
+            }
+
+
+        }
+        return result;
     }
 }
 

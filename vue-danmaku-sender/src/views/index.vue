@@ -421,7 +421,7 @@ export default {
           this.textarea = res.data.data.txtLog
           // console.log(this.textarea);
         }
-      }).catch(function (error) {
+      }).catch(error =>  {
         this.stopSetInterval()
         console.log(error);
       });
@@ -440,7 +440,7 @@ export default {
             if(res.data.code == 200){
               this.textarea = res.data.data.txtLog
             }
-          }).catch(function (error) {
+          }).catch(error =>  {
             this.stopSetInterval()
             console.log(error);
           });

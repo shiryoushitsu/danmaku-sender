@@ -21,7 +21,7 @@ public class ExoUtil {
 
 
     public static void main(String[] args) {
-        String fileName = "3333";
+        String fileName = "phony1108";
         String inputExoPath = "D:\\"+  fileName+ ".exo";
         String outputXmlPath = "D:\\"+ fileName +".xml";
 
@@ -438,12 +438,18 @@ public class ExoUtil {
                     if(text.length()>100){
                         text  = "(字符串长度已超100字符)";
                     }
+
                     //换行转义
                     if(text.contains("\n")||text.contains("\r")){
                         text = text.replaceAll("\r","");
 //                        text = text.replaceAll("\n","&#x000A;");
                         text = text.replace("\n","\\n");
                     }
+
+                    if(exoBean.getAlign() == 15){
+                        text = CommonUtil.rowToColumn(text);
+                    }
+
                     //解析aviutl文本中颜色标签 todo
                     boolean flag = text.contains("<") &&  text.contains(">");
                     if(flag){
@@ -465,6 +471,18 @@ public class ExoUtil {
                             exoBean.setStartX(x1 + screenWidth / 2);
                             Integer x2 = Double.valueOf(xArray[1]).intValue();
                             exoBean.setEndX(x2 + screenWidth / 2);
+
+                            if(xArray.length > 3){
+                                String access = xArray[3];
+                                //b站默认easein
+                                if("2".equals(access)){
+                                    exoBean.setLinearSpeedup(0);
+                                }else if("3".equals(access)) {
+                                    exoBean.setLinearSpeedup(1);
+                                }else {
+
+                                }
+                            }
                         } else {
                             Integer x1 = Double.valueOf(value).intValue();
                             exoBean.setX(x1);
@@ -579,6 +597,9 @@ public class ExoUtil {
                         ashadow.setShadowAlpha(doubleTrans(1-Double.valueOf(value)*0.01 ) + "-" + doubleTrans(1-Double.valueOf(value)*0.01));
                         exoBean.setAulShadow(ashadow);
                     }
+                    break;
+                case "align":
+                    exoBean.setAlign(Integer.valueOf(value));
                     break;
                 default:
             }

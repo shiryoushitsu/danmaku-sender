@@ -3,9 +3,11 @@
     <el-row :gutter="20" style="margin-left:auto;margin-right:auto;margin-top:22px;background-color: rgb(248, 250, 251);"> 
      <!-- 配置区 --> 
      <el-col :span="12"> 
-      <el-card style="width:600px;float:right;min-height:600px"> 
+      <el-card style="width:600px;float:right;min-height:600px"  body-style="padding-top:5px"> 
        <el-form ref="form" :model="form" label-width="80px"> 
-        <el-row> 
+  <el-tabs v-model="activeName" >
+    <el-tab-pane label="基本配置" name="first">
+                <el-row> 
          <el-col :span="12"> 
           <el-form-item label="账号缓存值1" prop="cookie" label-width="100px"> 
            <el-input v-model="form.cookie" placeholder="SESSDATA，相当于发送的弹幕的账号" /> 
@@ -61,52 +63,120 @@
          <el-col :span="12"> 
          </el-col> 
         </el-row> 
-        <el-collapse style=" display:none"> 
-         <el-collapse-item title="更多配置" name="1"> 
-          <el-row> 
-           <el-col :span="12"> 
-            <el-form-item label="字号" prop="fontSize" label-width="100px"> 
-             <el-select v-model="form.fontSize" placeholder="请选择字号"> 
-              <el-option label="小字号（18）" value="18"></el-option> 
-              <el-option label="标准字号（25）" value="25"></el-option> 
-             </el-select> 
-            </el-form-item> 
-           </el-col> 
-           <el-col :span="12"> 
-            <el-form-item label="发送间隔" prop="sendInterval" label-width="100px"> 
-             <el-input v-model="form.sendInterval" placeholder="发送弹幕间隔时间" maxlength="30"> 
-              <template slot="append">秒</template> 
-             </el-input> 
-            </el-form-item> 
-           </el-col> 
-          </el-row> 
-          <el-row> 
-           <el-col :span="12"> 
-            <el-col :span="10"> 
-             <el-form-item label="颜色" prop="color" label-width="100px"> 
-              <el-input v-model="form.color" placeholder="" maxlength="30" /> 
-             </el-form-item> 
-            </el-col> 
-            <el-col :span="2"> 
-             <el-color-picker v-model="hexColor" style="float:right"></el-color-picker> 
-            </el-col> 
-           </el-col> 
-           <el-col :span="12"> 
-           </el-col> 
-          </el-row> 
-         </el-collapse-item> 
-        </el-collapse> 
+
+
         <el-row style="margin-top:22px"> 
          <el-col :span="5"> 
-          <el-button @click="submitForm('preview')">预览信息</el-button> 
+          <el-button @click="submitPreviewForm()">预览信息</el-button> 
          </el-col> 
          <el-col :span="5"> 
-          <el-button @click="submitForm('send')">发送弹幕</el-button> 
+          <el-button @click="submitForm()">发送弹幕</el-button> 
          </el-col> 
          <el-col :span="5"> 
           <el-button @click="stopSendDanmaku()">停止发送</el-button> 
          </el-col> 
         </el-row> 
+
+    </el-tab-pane>
+    <el-tab-pane label="更多配置" name="second">
+
+        <el-row>
+          <el-col :span="12" style="display:none">
+              <el-form-item size="middle" label="首句时间" prop="sendFirstDmTime" label-width="100px" >
+                <!-- <el-input v-model="form.sendFirstDmTime"  placeholder="非必填，首句时间，调整时间轴"  /> -->
+                <el-time-picker  
+                  v-model="form.sendFirstDmTime" 
+                  :picker-options="{ selectableRange: '00:00:00 - 23:59:59' }" 
+                  :default-value="new Date(2021, 11, 0, 0, 0)"
+                  value-format="HH:mm:ss"
+                  placeholder="可用于调整时间轴"
+                  style="width:180px"
+                  >
+                </el-time-picker>
+              </el-form-item>
+          </el-col>
+          <el-col :span="12"  style="display:none">
+              <el-form-item size="middle" label="开始句" prop="sendStartDmRow" label-width="100px">
+                <el-input v-model="form.sendStartDmRow"  placeholder="配合发送测试弹幕使用，2为发送第二句歌词" maxlength="30" />
+              </el-form-item>
+          </el-col>
+        </el-row>
+
+   
+        <el-row>
+          <el-col :span="12"  style="display:none">
+            <el-form-item size="middle" label="时间补偿值" prop="sendFirstDmOffset" label-width="100px">
+              <el-input v-model="form.sendFirstDmOffset"  placeholder="可正负数" maxlength="30" >
+                  <template slot="append">毫秒</template>
+              </el-input>
+            </el-form-item>
+
+          </el-col>
+          <el-col :span="12">
+          
+          </el-col>
+        </el-row>
+   
+
+     <el-row>
+          <el-col :span="12"  style="display:none">
+                  <el-form-item size="middle" label="字号" prop="fontSize" label-width="100px">
+                      <el-select v-model="form.fontSize" placeholder="请选择字号">
+                      <el-option label="小字号（18）" value="18"></el-option>
+                      <el-option label="标准字号（25）" value="25"></el-option>
+                    </el-select>
+                  </el-form-item>
+          </el-col>
+
+            <el-col :span="10"  style="display:none">
+                  <el-form-item size="middle" label="颜色" prop="color" label-width="100px">
+                    <el-input v-model="form.color"  placeholder="" maxlength="30" />
+                  </el-form-item>
+          </el-col>
+            <el-col :span="2"  style="display:none">
+                  <el-color-picker v-model="hexColor" style="float:right"></el-color-picker>
+          </el-col>
+        </el-row>
+
+
+            <el-row>
+   
+              <el-col :span="12">
+
+                      <el-form-item size="middle" label="发送间隔" prop="sendInterval" label-width="100px">
+                        <el-input v-model="form.sendInterval"  placeholder="发送弹幕间隔时间" maxlength="30" >
+                           <template slot="append">秒</template>
+                        </el-input>
+                      </el-form-item>
+
+              </el-col>
+                         <el-col :span="12">
+
+                <el-form-item size="middle" label="附加时间" prop="sendRandomTime" label-width="100px">
+                    <el-input v-model="form.sendRandomTime"  placeholder="附加随机时间" >
+                      <template slot="append">秒</template>
+                      </el-input>
+                </el-form-item>
+
+              </el-col>
+            </el-row>
+              <el-row>
+                <el-col :span="12">
+                </el-col>
+                <el-col :span="12">
+
+                      <el-form-item size="middle" label="重发间隔" prop="sendRetryInterval" label-width="100px">
+                        <el-input v-model="form.sendRetryInterval"  placeholder="重发间隔" maxlength="30" >
+                           <template slot="append">分</template>
+                        </el-input>
+                      </el-form-item>
+                        
+                </el-col>
+              </el-row>
+
+    </el-tab-pane>
+  </el-tabs>
+
        </el-form> 
       </el-card> 
      </el-col> 
@@ -164,59 +234,119 @@ export default {
         pool: '0',
         sendPrefix: null,
         sendSuffix: null,
-        sendFirstDmTime: '',
+        sendFirstDmTime: null,
         sendFirstDmOffset: null,
-        sendInterval: '10',
+        sendInterval: '20',
         sendMode: '1',
         sendStartDmRow: '1',
         sendPreview: '1',
+        sendRandomTime: '0',
+        sendRetryInterval: '1',
+        
+      },
+      rules: {     // 表单校验
+        // cookie: [
+        //   { required: true, message: "发送时cookie不能为空" }
+        // ],
+        // csrf: [
+        //   { required: true, message: "发送时csrf不能为空"}
+        // ],
+        // bvid: [
+        //   { required: true, message: "发送时bvid不能为空" }
+        // ],
       },
       textarea: '',
       txtFile: null,
       requestId: '',
       timerStatus: 0,
-      timer: null //轮询器
+      timer: null, //轮询器
+      uploadName: '请上传lrc或ass文件',
+      activeName: 'first',
     };
   },
   methods: {
     // 发送弹幕
-    submitForm(type){
+    submitForm(){
+      if (this.txtFile == null) {
+        this.$message({
+          message: '请先上传文件!',
+          type: 'warning'
+        })
+        return
+      }
+      this.$refs["form"].validate(valid => {
+        if (valid) {
+          let _this = this;
+          this.textarea = ''
+          let param = new FormData() // 创建form对象
+          param.append('file', this.txtFile) // 通过append向form对象添加数据
+          for(let key in this.form){
+            if(this.form[key] != null){
+              param.append(key,this.form[key])
+            }
+          }
+
+          this.createCode();
+          param.append('requestId', this.requestId) // 每次请求创建一个随机Id
+          let config = {
+              headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8' }
+          }
+          this.axios.post('/danmaku/sendDanmakuXml', param, config).then(res => {
+            // let res = JSON.stringify(response);
+            if(res.data.code == 200){
+              //1、预览是通过接口返回日志数据
+              // if(type == 'preview'){
+                this.textarea = res.data.data.txtLog
+                console.log(this.textarea);
+              // }
+              //4、关闭轮询
+              _this.stopSetInterval()
+              this.timerStatus = 0;
+
+            }
+          }).catch(function (error) {
+            _this.stopSetInterval()
+            debugger
+            console.log(error);
+          });
+
+          console.log("轮询弹幕日志接口")
+          this.createSetInterval()
+        }
+      });
+    },
+
+    // 预览信息
+    submitPreviewForm(){
+       if (this.txtFile == null) {
+        this.$message({
+          message: '请先上传文件!',
+          type: 'warning'
+        })
+        return
+      }
       this.textarea = ''
-      let param = new FormData() // 创建form对象
-      param.append('file', this.txtFile) // 通过append向form对象添加数据
+      let param = new FormData()
+      param.append('file', this.txtFile)
       for(let key in this.form){
         if(this.form[key] != null){
           param.append(key,this.form[key])
         }
       }
-      if(type == 'preview'){
-        param.set("sendMode",-1) // 预览信息 sendMode为-1
-      }
+      param.set("sendMode",-1) // 预览信息
       this.createCode();
-      param.append('requestId', this.requestId) // 每次请求创建一个随机Id
+      param.append('requestId',"p" + this.requestId) // 每次请求创建一个随机Id
       let config = {
           headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8' }
       }
       this.axios.post('/danmaku/sendDanmakuXml', param, config).then(res => {
-        // let res = JSON.stringify(response);
+        debugger
         if(res.data.code == 200){
-          //1、预览是通过接口返回日志数据
-          // if(type == 'preview'){
-            this.textarea = res.data.data.txtLog
-            console.log(this.textarea);
-          // }
-          //4、关闭轮询
-          this.stopSetInterval()
-          this.timerStatus = 0;
-
+            this.textarea = res.data.msg
         }
       }).catch(function (error) {
-        this.stopSetInterval()
-        console.log(this.timer)
         console.log(error);
       });
-      console.log("创建获取弹幕日志轮询接口")
-      this.createSetInterval()
     },
 
     // 获取弹幕日志
@@ -225,7 +355,7 @@ export default {
       paramLog.append('fileName', this.txtFile.name)
       paramLog.append('requestId', this.requestId)
       let config = {
-          headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8' }
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8' }
       }
       //2、发送是通过获取日志接口返回日志数据
       this.axios.post('/danmaku/getFileLog', paramLog, config).then(res => {
@@ -233,7 +363,7 @@ export default {
           this.textarea = res.data.data.txtLog
           // console.log(this.textarea);
         }
-      }).catch(function (error) {
+      }).catch(error =>  {
         this.stopSetInterval()
         console.log(error);
       });
@@ -252,7 +382,7 @@ export default {
             if(res.data.code == 200){
               this.textarea = res.data.data.txtLog
             }
-          }).catch(function (error) {
+          }).catch(error =>  {
             this.stopSetInterval()
             console.log(error);
           });
@@ -276,6 +406,7 @@ export default {
         this.timer = null
       }
     },
+
 
     // 初始化用户账号缓存信息
     getConfig(){

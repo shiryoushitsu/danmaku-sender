@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.hikari.danmaku.entity.Ass;
+import com.hikari.danmaku.entity.BaseDanmaku;
 import com.hikari.danmaku.service.intf.IDanmakuService;
 import com.hikari.danmaku.utils.ColorUtil;
 import com.hikari.danmaku.vo.SendDanmakuM1Vo;
@@ -135,6 +136,44 @@ public class DanmakuService implements IDanmakuService {
         }
 
     }
+
+    @Override
+    public void initDanmakuXml(SendDanmakuM1Vo sendDanmakuM1Vo, List<BaseDanmaku> danmakuList) throws Exception{
+        // 根据bvid + pardId获取视频信息
+        if(StringUtils.isBlank(sendDanmakuM1Vo.getBvid())){
+            sendDanmakuM1Vo.setOid("无");
+            sendDanmakuM1Vo.setVideoTitle("无");
+            sendDanmakuM1Vo.setPartTitle("无");
+        }else {
+            if(sendDanmakuM1Vo.getPart() == null){
+                sendDanmakuM1Vo.setPart(1);
+            }
+            Map<String,Object> videoMap = new HashMap<>();
+            String title = "无";
+            String pageCid = "无";
+            String pagePart = "无";
+            int part = 0;
+            if(sendDanmakuM1Vo.getBvid()!=null){
+                videoMap =  getBiliVideoInfo(sendDanmakuM1Vo.getBvid());
+                title = (String)videoMap.get("title");
+                part =  Integer.valueOf(sendDanmakuM1Vo.getPart())-1;
+                JSONArray jsonArray =(JSONArray)videoMap.get("page");
+                JSONObject jo = jsonArray.getJSONObject(part);
+                pageCid = jo.getString("cid");
+                pagePart = jo.getString("part");
+            }
+            sendDanmakuM1Vo.setOid(pageCid);
+            sendDanmakuM1Vo.setVideoTitle(title);
+            sendDanmakuM1Vo.setPartTitle(pagePart);
+        }
+
+        //将字符串开始时间（秒）转为毫秒
+        for(BaseDanmaku dm : danmakuList){
+            String startTimeSeconds = String.valueOf(Math.round(Double.valueOf(dm.getStartTime())*1000)) ;
+            dm.setStartTime(startTimeSeconds);
+        }
+    }
+
 
 
     @Override

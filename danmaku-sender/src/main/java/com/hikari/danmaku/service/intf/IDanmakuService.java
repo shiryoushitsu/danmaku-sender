@@ -1,6 +1,7 @@
 package com.hikari.danmaku.service.intf;
 
 import com.hikari.danmaku.entity.Ass;
+import com.hikari.danmaku.entity.BaseDanmaku;
 import com.hikari.danmaku.vo.SendDanmakuM1Vo;
 import com.hikari.danmaku.vo.SendDanmakuM7Vo;
 
@@ -14,6 +15,7 @@ public interface IDanmakuService {
 
     void initDanmakuM7(SendDanmakuM7Vo sendDanmakuM7Vo, List<Ass> danmakuList) throws Exception;
 
+    void initDanmakuXml(SendDanmakuM1Vo sendDanmakuM1Vo, List<BaseDanmaku> danmakuList) throws Exception;
 
     String updateColor(String color16);
 
