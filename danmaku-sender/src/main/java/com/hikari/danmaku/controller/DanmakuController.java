@@ -265,8 +265,15 @@ public class DanmakuController {
         writer.append(configTxt);
         writer.append(linesTxt);
 
-        String inCheck = "true";
-        String outCheck = "true";
+        boolean inCheck = sendDanmakuM7Vo.getInChecked();
+        boolean outCheck = sendDanmakuM7Vo.getOutChecked();
+        if( !inCheck ){
+            sendDanmakuM7Vo.setInDuration(0.0);
+        }
+        if( !inCheck && !outCheck ){
+            sendDanmakuM7Vo.setOverlapTime(0);
+            System.out.println("重叠时间为0");
+        }
 
         // 循环调用接口发送弹幕
         logService.writePlus(writer,"───────────────────────发送──────────────────────\n");
@@ -275,10 +282,10 @@ public class DanmakuController {
         for (int j = startRow; j <= lrcCount; j++) {
             //高级弹幕三段发送
             for(int k = 0; k < 3; k++) {
-                if (!"true".equals(inCheck) && k == 0) {//跳过淡入部分
+                if (!inCheck && k == 0) {//跳过淡入部分
                     continue;
                 }
-                if (!"true".equals(outCheck) && k == 2) {//跳过淡出部分
+                if (!outCheck && k == 2) {//跳过淡出部分
                     continue;
                 }
                 Random random =new Random();
@@ -314,7 +321,7 @@ public class DanmakuController {
                 } else {
                     double stage1ltDouble = sendDanmakuM7Vo.getInDuration() *1000;
                     startTime = startTime + (int)stage1ltDouble - sendDanmakuM7Vo.getOverlapTime() ;
-                    double sylStr = (lrcDanmaku.getSyl()- (int)stage1ltDouble +  sendDanmakuM7Vo.getOverlapTime()  - outOffset) * 0.001 ;
+                    double sylStr = (lrcDanmaku.getSyl() - (int)stage1ltDouble +  sendDanmakuM7Vo.getOverlapTime()  - outOffset) * 0.001 ;
                     sendDanmakuM7Vo.setDuration(sylStr);
                     content = DanmakuUtil.wrapperDanmaku(sendDanmakuM7Vo);
 
@@ -396,7 +403,6 @@ public class DanmakuController {
         FileReader reader = new FileReader(path);
         JSONObject rspJson = new JSONObject();
         rspJson.put("effectTem",reader.readString());
-        System.out.println("读取效果模板成功");
 
         List<SendDanmakuM7Vo> m7VoList = new ArrayList<>();
         List<String> linesList = reader.readLines();
@@ -414,7 +420,6 @@ public class DanmakuController {
     public ResponseResult getConfig() throws Exception {
         String path = System.getProperty("user.dir") + "/config.txt";
         FileReader reader = new FileReader(path);
-        System.out.println("读取缓存成功");
         JSONObject rspJson = new JSONObject();
         List<String> linesList = reader.readLines();
         for(String lines : linesList){

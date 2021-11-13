@@ -40,7 +40,8 @@ public class SendDanmakuM7Vo extends SendDanmakuVo {
     @ApiModelProperty("淡入运动耗时(毫秒)")
     private Integer inMoveDuration;
 
-
+    @ApiModelProperty("是否有淡入段")
+    private Boolean inChecked;
 
     @ApiModelProperty("outStartX")
     private Double outStartX;
@@ -64,6 +65,8 @@ public class SendDanmakuM7Vo extends SendDanmakuVo {
     @ApiModelProperty("淡出运动耗时(毫秒)")
     private Integer outMoveDuration;
 
+    @ApiModelProperty("是否有淡出段")
+    private Boolean outChecked;
 
     @ApiModelProperty("lrc间隙时间")
     private Integer lrcIntervalTime;
