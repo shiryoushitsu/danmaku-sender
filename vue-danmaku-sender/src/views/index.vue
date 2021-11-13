@@ -496,7 +496,6 @@ export default {
       let mm = new Date().getMinutes() < 10 ? '0' + new Date().getMinutes() : new Date().getMinutes()
       code =""+ hh + mm + code;
       this.requestId = code ;
-      console.log(this.requestId);
     },
 
     // 文件上传

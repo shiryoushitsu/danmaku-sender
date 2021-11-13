@@ -62,7 +62,8 @@
                         </el-form-item>
                     </el-col>
                     <el-col :span="12">
-      
+                          <el-checkbox v-model="form.inChecked">是否有淡入段</el-checkbox>
+  
                     </el-col>
                 </el-row>
             </el-tab-pane>
@@ -135,8 +136,6 @@
                   </el-col>
                 </el-row>
 
-               
-
                 <el-row>
                     <el-col :span="12">
                             <el-form-item size="small" label="字号" prop="fontSize" label-width="100px">
@@ -144,12 +143,12 @@
                
                             </el-form-item>
                     </el-col>
-       <el-col :span="10">
+                 <el-col :span="10">
                     <el-form-item   size="small" label="颜色" prop="color" label-width="100px">
                         <el-input v-model="form.color"  placeholder="" maxlength="30" />
                     </el-form-item>
                   </el-col>
-                    <el-col :span="2">
+                  <el-col :span="2">
                       <el-color-picker v-model="hexColor" style="float:right"></el-color-picker>
                   </el-col>
 
@@ -171,9 +170,6 @@
                     </el-col>
                 </el-row>
 
-
-          
-    
                 <el-row>
                   <el-col :span="12">
             
@@ -310,8 +306,10 @@
                             <el-input v-model="form.outAlpha"  placeholder="格式：百分比-百分比"/>
                         </el-form-item>
                     </el-col>
+                    <el-col :span="12">
+                      <el-checkbox v-model="form.outChecked">是否有淡出段</el-checkbox>
+                    </el-col>
                 </el-row>
-
             </el-tab-pane>
             <el-tab-pane label="更多配置" name="fourth">
                <el-row>
@@ -504,6 +502,7 @@ export default {
         inStartY: 60,
         inEndX: 20,
         inEndY: 60,
+        inChecked: true,
         outAlpha: '1-0',
         outDuration: 0.3,
         outMoveDuration: 300,
@@ -511,6 +510,7 @@ export default {
         outStartY: 40,
         outEndX: 60,
         outEndY: 60,
+        outChecked: true,
         overlapTime: 50,
         outOffset: 250,
         sendRandomTime: 0,
@@ -697,7 +697,6 @@ export default {
       let mm = new Date().getMinutes() < 10 ? '0' + new Date().getMinutes() : new Date().getMinutes()
       code =""+ hh + mm + code;
       this.requestId = code ;
-      console.log(this.requestId);
     },
 
     // 文件上传

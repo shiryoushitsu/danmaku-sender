@@ -278,8 +278,8 @@ export default {
         if (valid) {
           let _this = this;
           this.textarea = ''
-          let param = new FormData() // 创建form对象
-          param.append('file', this.txtFile) // 通过append向form对象添加数据
+          let param = new FormData()
+          param.append('file', this.txtFile)
           for(let key in this.form){
             if(this.form[key] != null){
               param.append(key,this.form[key])
@@ -292,14 +292,9 @@ export default {
               headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8' }
           }
           this.axios.post('/danmaku/sendDanmakuXml', param, config).then(res => {
-            // let res = JSON.stringify(response);
             if(res.data.code == 200){
-              //1、预览是通过接口返回日志数据
-              // if(type == 'preview'){
                 this.textarea = res.data.data.txtLog
                 console.log(this.textarea);
-              // }
-              //4、关闭轮询
               _this.stopSetInterval()
               this.timerStatus = 0;
 
@@ -435,7 +430,6 @@ export default {
       let mm = new Date().getMinutes() < 10 ? '0' + new Date().getMinutes() : new Date().getMinutes()
       code =""+ hh + mm + code;
       this.requestId = code ;
-      console.log(this.requestId);
     },
 
     // 文件上传
