@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
  *
  */
 
-public  class LrcUtil {
+public class LrcUtil {
     public static void main(String []args) {
         String s ="Sat Jan 01 2000 00:00:05 GMT+0800 (中国标准时间)";
 //         String s ="00:00:03 35345354";

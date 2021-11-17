@@ -2,13 +2,11 @@ package com.hikari.danmaku.controller;
 
 import cn.hutool.core.io.file.FileReader;
 import cn.hutool.core.io.file.FileWriter;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.hikari.danmaku.common.Response;
 import com.hikari.danmaku.common.ResponseResult;
 import com.hikari.danmaku.entity.BaseDanmaku;
-import com.hikari.danmaku.entity.SeniorDanmaku;
 import com.hikari.danmaku.service.intf.IDanmakuService;
 import com.hikari.danmaku.service.intf.IFileService;
 import com.hikari.danmaku.service.intf.ILogService;
@@ -19,16 +17,13 @@ import com.hikari.danmaku.vo.SendDanmakuM7Vo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static com.hikari.danmaku.service.impl.LogService.*;
-import static com.hikari.danmaku.utils.DanmakuUtil.wrapperDanmaku;
 import static com.hikari.danmaku.utils.LrcUtil.danmakuList;
 import static com.hikari.danmaku.utils.LrcUtil.lrcToAssList;
 import static com.hikari.danmaku.utils.LrcUtil.parseOffset;
@@ -150,7 +145,7 @@ public class DanmakuController {
             color =  danmakuService.updateColor(color);   //微调颜色
             sendDanmakuM1Vo.setColor(color);
             //发送弹幕
-            ResponseResult sendResponse = HttpUtil.dmPost(content,startTime, sendDanmakuM1Vo);
+            ResponseResult sendResponse = DmHttpUtil.dmPost(content,startTime, sendDanmakuM1Vo);
             if(sendResponse.getCode() == 0){
                 danmakuSum +=1;
                 logService.writePlus(writer,"{} 第{}次发送成功：{}\n",DateUtil.getTime(),danmakuSum,content);
@@ -160,7 +155,7 @@ public class DanmakuController {
                 logService.writePlus(writer,retryTem,DateUtil.getTime(),sendDanmakuM1Vo.getSendRetryInterval());
                 Thread.sleep(sendDanmakuM1Vo.getSendRetryInterval() * 60 * 1000); //设置暂停的时间
                 sendDanmakuM1Vo.setColor(danmakuService.updateColor(color)); //微调颜色
-                sendResponse = HttpUtil.dmPost(content, startTime, sendDanmakuM1Vo);
+                sendResponse = DmHttpUtil.dmPost(content, startTime, sendDanmakuM1Vo);
                 if(sendResponse.getCode() == 0){
                     logService.writePlus(writer,"{} 第{}次延时发送成功: {}\n",DateUtil.getTime(),danmakuSum,content);
                     Thread.sleep(sleepTime);
@@ -331,7 +326,7 @@ public class DanmakuController {
                 color =  danmakuService.updateColor(color);   //微调颜色
                 sendDanmakuM7Vo.setColor(color);
                 //发送弹幕
-                ResponseResult sendResponse = HttpUtil.dmPost(content, startTime, sendDanmakuM7Vo);
+                ResponseResult sendResponse = DmHttpUtil.dmPost(content, startTime, sendDanmakuM7Vo);
                 if(sendResponse.getCode() == 0){
                     danmakuSum +=1;
                     logService.writePlus(writer,"{} 第{}次发送成功：{}\n",DateUtil.getTime(), danmakuSum, content);
@@ -341,7 +336,7 @@ public class DanmakuController {
                     logService.writePlus(writer,retryTem,DateUtil.getTime(), sendDanmakuM7Vo.getSendRetryInterval());
                     Thread.sleep(sendDanmakuM7Vo.getSendRetryInterval() * 60 * 1000); //设置暂停的时间
                     sendDanmakuM7Vo.setColor(danmakuService.updateColor(color)); //微调颜色
-                    sendResponse = HttpUtil.dmPost(content, startTime, sendDanmakuM7Vo);
+                    sendResponse = DmHttpUtil.dmPost(content, startTime, sendDanmakuM7Vo);
                     if(sendResponse.getCode() == 0){
                         logService.writePlus(writer,"{} 第{}次延时发送成功: {}\n",DateUtil.getTime(), danmakuSum, content);
                         Thread.sleep(sleepTime);
@@ -473,6 +468,8 @@ public class DanmakuController {
         int firstDmOffset = 0;//时间偏移量
         int danmakuSum = 0;//发送弹幕统计数
 
+        //弹幕模式
+        sendDanmakuM1Vo.setMode(danmakuList.get(0).getMode());
 
         if(sendDanmakuM1Vo.getSendFirstDmOffset()!=null){
             firstDmOffset =  sendDanmakuM1Vo.getSendFirstDmOffset()  ;
@@ -547,7 +544,7 @@ public class DanmakuController {
             color =  danmakuService.updateColor(color);   //微调颜色
             sendDanmakuM1Vo.setColor(color);
             //发送弹幕
-            ResponseResult sendResponse = HttpUtil.dmPost(content, startTime, sendDanmakuM1Vo);
+            ResponseResult sendResponse = DmHttpUtil.dmPost(content, startTime, sendDanmakuM1Vo);
             if(sendResponse.getCode() == 0){
                 danmakuSum +=1;
                 logService.writePlus(writer,"{} 第{}次发送成功：{}\n",DateUtil.getTime(),danmakuSum,content);
@@ -557,7 +554,7 @@ public class DanmakuController {
                 logService.writePlus(writer,retryTem,DateUtil.getTime(),sendDanmakuM1Vo.getSendRetryInterval());
                 Thread.sleep(sendDanmakuM1Vo.getSendRetryInterval() * 60 * 1000); //设置暂停的时间
                 sendDanmakuM1Vo.setColor(danmakuService.updateColor(color)); //微调颜色
-                sendResponse = HttpUtil.dmPost(content, startTime, sendDanmakuM1Vo);
+                sendResponse = DmHttpUtil.dmPost(content, startTime, sendDanmakuM1Vo);
                 if(sendResponse.getCode() == 0){
                     logService.writePlus(writer,"{} 第{}次延时发送成功: {}\n",DateUtil.getTime(),danmakuSum,content);
                     Thread.sleep(sleepTime);

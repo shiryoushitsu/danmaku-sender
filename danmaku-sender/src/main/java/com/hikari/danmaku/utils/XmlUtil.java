@@ -2,6 +2,7 @@ package com.hikari.danmaku.utils;
 
 import com.hikari.danmaku.constants.Mode;
 import com.hikari.danmaku.entity.BaseDanmaku;
+import com.hikari.danmaku.entity.SeniorDanmaku;
 import com.hikari.danmaku.vo.SendDanmakuM1Vo;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Attribute;
@@ -70,4 +71,56 @@ public class XmlUtil {
 
         return dmList;
     }
+
+
+    // 解析弹幕xml的属性
+    public static SeniorDanmaku parseXmlAttribute(String attributeStr) {
+            String[] attrArray = attributeStr.split(",");
+            SeniorDanmaku danmakuEntity = new SeniorDanmaku();
+            danmakuEntity.setStartTime(CommonUtil.df3(Double.valueOf(attrArray[0])));
+            danmakuEntity.setMode(Integer.valueOf(attrArray[1]) );
+            danmakuEntity.setFontSize(Integer.valueOf(attrArray[2]));
+            String strHex ="";
+            if(attrArray[3].length() == 6){
+                strHex = attrArray[3];
+            }else {
+                int valueTen = Integer.valueOf(attrArray[3]);
+                strHex =Integer.toHexString(valueTen);
+            }
+
+            int timestamp = 0;
+            if(StringUtils.isNumeric(attrArray[4])){
+                timestamp = Integer.valueOf(attrArray[4]);
+            }
+
+            danmakuEntity.setColor(strHex);
+            danmakuEntity.setTimestamp(timestamp);
+            danmakuEntity.setPool(Integer.valueOf(attrArray[5]));
+            danmakuEntity.setUid(attrArray[6]);
+            danmakuEntity.setRowId(attrArray[7]);
+
+            if(attrArray.length >=9){
+               String weight = attrArray[8];
+               danmakuEntity.setWeight(Integer.valueOf(weight));
+            }
+
+        return danmakuEntity;
+    }
+
+    // 组装xml
+    public static String buildDanmakuXml(SeniorDanmaku seniorDanmaku) {
+        StringBuffer danmakuStr = new StringBuffer();
+        danmakuStr.append("<d p=\"");
+        danmakuStr.append(seniorDanmaku.getStartTime()).append(",");
+        danmakuStr.append(seniorDanmaku.getMode()).append(",");
+        danmakuStr.append(seniorDanmaku.getFontSize()).append(",");
+        danmakuStr.append(seniorDanmaku.getColor()).append(",");
+        danmakuStr.append(DateUtil.LongToTime(seniorDanmaku.getTimestamp().longValue()*1000L)).append(",");
+        danmakuStr.append(seniorDanmaku.getPool());
+        danmakuStr.append(",null,null\">");
+        danmakuStr.append(seniorDanmaku.getContent());
+        danmakuStr.append("</d>");
+        return danmakuStr.toString();
+    }
+
 }

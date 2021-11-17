@@ -14,7 +14,7 @@ import org.apache.commons.httpclient.params.HttpMethodParams;
 
 import java.io.IOException;
 
-public class HttpUtil {
+public class DmHttpUtil {
 
     private static String dmPostUrl = "http://api.bilibili.com/x/v2/dm/post";
 

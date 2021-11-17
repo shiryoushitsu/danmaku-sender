@@ -13,7 +13,7 @@ import java.text.DecimalFormat;
 import java.util.*;
 import java.util.List;
 
-public  class CommonUtil {
+public class CommonUtil {
     public static void main(String []args)  {
        String txt = "一二三层";
         System.out.println(rowToColumn(txt));

@@ -6,7 +6,7 @@ import java.awt.*;
  * create by AwaiHikari on 2020-07-01 20:50
  */
 
-public  class ColorUtil {
+public class ColorUtil {
 
     public static void main(String[] argv) throws Exception{
         String color =hsv2rgb(80,1,1);

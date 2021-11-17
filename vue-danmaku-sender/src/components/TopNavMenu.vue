@@ -4,8 +4,9 @@
       <el-menu-item index="/">发送普权弹幕歌词</el-menu-item>
       <el-menu-item index="m7">发送高级弹幕歌词</el-menu-item>
       <el-menu-item index="xml">发送XML弹幕文件</el-menu-item>
-      <!-- <el-menu-item index="4">发送TXT字符画文件</el-menu-item> -->
-      <!-- <el-menu-item index="5">其他工具</el-menu-item> -->
+      <el-menu-item index="ascii-text">生成字符字</el-menu-item>
+      <el-menu-item index=""><a href="http://doc.danmaku.fans" target="_blank" style="text-decoration:none">使用指南</a></el-menu-item>
+      <!-- <el-menu-item index="5"/>其他工具</el-menu-item> -->
       
       <!-- <el-menu-item index="6">返回博客</el-menu-item>   -->
       <!-- <el-submenu index="2">

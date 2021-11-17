@@ -46,10 +46,10 @@ public class AviutlExo {
     @ApiModelProperty("文本")
     private String text;
 
-    @ApiModelProperty("X坐标")
+    @ApiModelProperty("X坐标(Aviutl中坐标)")
     private Integer X;
 
-    @ApiModelProperty("Y坐标")
+    @ApiModelProperty("Y坐标(Aviutl中坐标)")
     private Integer Y;
 
     @ApiModelProperty("Z坐标/改用为层级/会换算为毫秒数")

@@ -4,7 +4,7 @@ public enum Mode {
     NORMAL("普通弹幕", 1),
     BOTTOM("底部弹幕", 4),
     TOP("顶部弹幕", 5),
-    M7("顶部弹幕", 7),
+    M7("高级弹幕", 7),
     M9("BAS弹幕", 9);
 
     private String name;

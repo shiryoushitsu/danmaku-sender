@@ -19,26 +19,40 @@ public class ExoUtil {
     private static Integer currentChain =  0;
     private static XmlEffect currentTXmlEffect ;
 
-
+    // 15寸 760 510  38.8% / 14寸 850 560 43.4%
     public static void main(String[] args) {
-        String fileName = "phony1108";
-        String inputExoPath = "D:\\"+  fileName+ ".exo";
-        String outputXmlPath = "D:\\"+ fileName +".xml";
+        String fileName = "850测试";
+        String inputExoPath = "C:\\Users\\hikari\\Desktop\\"+  fileName+ ".exo";
+        String outputXmlPath = "C:\\Users\\hikari\\Desktop\\"+ fileName +".xml";
+
+        XmlEffect XmlEffect = new XmlEffect();
+        XmlEffect.setOutline(false);
+        XmlEffect.setLayer(true);
+        XmlEffect.setLinearSpeedup(false);
+        XmlEffect.setAdvanceStartTime(false);
+        XmlEffect.setDelayEndTime(true);
+        currentTXmlEffect = XmlEffect;
 
         //1.解析exo文本返回分段List
         List<Map<String,String>> exoList = parseExoToList(inputExoPath);
+
         //2.将分段List优化为exo对象list
         List<AviutlExo> exoObjectList = parseExoList(exoList);
+
         //3.将处理好的exo对象list转为m7xml
-        String xmlStr =exoToXml(exoObjectList);
+        String xmlStr = exoToXml(exoObjectList);
 
         //输出字符串到文件
         writeStringToFile(outputXmlPath,xmlStr);
 
     }
 
-
-    //1、解析exo返回分段List
+    /**
+     * 1、解析exo返回分段List
+     *
+     * @param path
+     * @return
+     */
     public static List<Map<String,String>> parseExoToList(String path)  {
         String encoding = "utf-8";
         List<Map<String,String>> partList = new ArrayList<>();
@@ -85,21 +99,20 @@ public class ExoUtil {
         return partList;
     }
 
-    //2、解析exoList返回段对象
-    public static List<AviutlExo>  parseExoList(List<Map<String,String>>exoList) {
-        XmlEffect XmlEffect = new XmlEffect();
-        XmlEffect.setOutline(false);
-        XmlEffect.setLayer(true);
-        XmlEffect.setLinearSpeedup(false);
-        XmlEffect.setAdvanceStartTime(false);
-        XmlEffect.setDelayEndTime(true);
-        currentTXmlEffect = XmlEffect;
+    /**
+     * 2、解析exoList返回段对象
+     *
+     * @param exoList
+     * @return
+     */
+    public static List<AviutlExo> parseExoList(List<Map<String,String>>exoList) {
+
 
         List<AviutlExo> partExoList =  new ArrayList<>();
         AviutlExo curExoVO = new AviutlExo();
         for(int i = 0; i < exoList.size();i++){
             Map<String,String> exoListMap = new LinkedHashMap<>();
-            exoListMap =exoList.get(i);
+            exoListMap = exoList.get(i);
             //不包含点的，即主段
             if(!exoListMap.get("partName").contains(".")){
                 AviutlExo exoVO = new AviutlExo();
@@ -107,9 +120,46 @@ public class ExoUtil {
                 partExoList.add(curExoVO);
             }
             for(Map.Entry<String, String> entry : exoListMap.entrySet()) {
+                // 2.5、处理每段属性，返回exo对象 todo
                 curExoVO = mapToExo(entry.getKey(),entry.getValue(),curExoVO);
             }
         }
+
+        // 2.6、针对m7，exo对象各个字段影响修正（如换行、坐标瞄点）
+        for(AviutlExo aviutlExo : partExoList){
+            //垂直向上 左
+            if(aviutlExo.getAlign() != null){
+                if( 15 == aviutlExo.getAlign()){
+                    String text = aviutlExo.getText();
+                    text = CommonUtil.rowToColumn(text);
+                    aviutlExo.setText(text);
+                }else if( 4 == aviutlExo.getAlign()  ){//中心对齐
+                    int X = aviutlExo.getX();
+                    int startX = aviutlExo.getStartX();
+                    int endX = aviutlExo.getEndX();
+                    int Y = aviutlExo.getY();
+                    int startY = aviutlExo.getStartY();
+                    int endY = aviutlExo.getEndY();
+
+                    int fontsize = aviutlExo.getSize();
+                    int textLength = aviutlExo.getText().length();
+
+                    int diff = Math.floorDiv(textLength * fontsize,2);
+                    aviutlExo.setX(X - diff);
+                    aviutlExo.setStartX(startX - diff);
+                    aviutlExo.setEndX(endX - diff);
+
+                    aviutlExo.setY(Y - Math.floorDiv(fontsize,2));
+                    aviutlExo.setStartY(startY - Math.floorDiv(fontsize,2));
+                    aviutlExo.setEndY(endY - Math.floorDiv(fontsize,2));
+                }
+            }
+
+        }
+
+
+
+
 
         //保留文本文件
         Iterator<AviutlExo> itr = partExoList.iterator();
@@ -195,29 +245,28 @@ public class ExoUtil {
             }
         }
 
-        //分开处理anm效果
+        //2.9 分开处理anm效果 todo
         List<String> anmList = anmList();
         for(String anm:anmList){
-
             partExoList = addAnmEffect(partExoList,anm);
         }
 
 
-        //M7额外逻辑处理
-        for(AviutlExo  avi :partExoList ){
+        //M7额外全局逻辑处理
+        for(AviutlExo  avi : partExoList ){
             if("文本".equals(avi.getObjName()) ){
                 //是否有层级
-                if(XmlEffect.isLayer()){
+                if(currentTXmlEffect.isLayer()){
                     avi.setStartTime(d3(avi.getStartTime() + avi.getZ()*0.001));
                 }
                 //是否线性加速
-                if(XmlEffect.isLinearSpeedup()){
+                if(currentTXmlEffect.isLinearSpeedup()){
                     avi.setLinearSpeedup(1);
                 }else {
                     avi.setLinearSpeedup(0);
                 }
                 //是否直接加描边
-                if(XmlEffect.isOutline()){
+                if(currentTXmlEffect.isOutline()){
                     avi.setOutline(1);
                 }
             }
@@ -226,11 +275,15 @@ public class ExoUtil {
         //时间排序
         partExoList = partExoList.stream().sorted(Comparator.comparing(AviutlExo::getStartTime)).collect(Collectors.toList());
 
-
         return partExoList;
     }
 
-    //3、将处理好的exoList转为m7xml
+    /**
+     * 3、将处理好的exoList转为m7xml
+     *
+     * @param exoList
+     * @return
+     */
     public static String exoToXml(List<AviutlExo> exoList){
         System.out.println("******************************************");
         XmlEffect XmlEffect = new XmlEffect();
@@ -303,8 +356,15 @@ public class ExoUtil {
         return  xml.toString();
     }
 
-    //2.5、处理每段属性，返回exo对象
-    public static AviutlExo mapToExo(String key ,String value ,AviutlExo exoBean){
+    /**
+     * 2.5、处理每段属性，返回exo对象
+     *
+     * @param key
+     * @param value
+     * @param exoBean
+     * @return
+     */
+    public static AviutlExo mapToExo(String key ,String value , AviutlExo exoBean){
         if("动画效果".equals(exoBean.get_name())){
             List<AulAnmEffect> currentListAnm = new ArrayList<>();
             AulAnmEffect aviAumBean = new AulAnmEffect();
@@ -446,10 +506,6 @@ public class ExoUtil {
                         text = text.replace("\n","\\n");
                     }
 
-                    if(exoBean.getAlign() == 15){
-                        text = CommonUtil.rowToColumn(text);
-                    }
-
                     //解析aviutl文本中颜色标签 todo
                     boolean flag = text.contains("<") &&  text.contains(">");
                     if(flag){
@@ -485,6 +541,7 @@ public class ExoUtil {
                             }
                         } else {
                             Integer x1 = Double.valueOf(value).intValue();
+
                             exoBean.setX(x1);
                             exoBean.setStartX(x1 + screenWidth / 2);
                             exoBean.setEndX(x1 + screenWidth / 2);
@@ -608,7 +665,13 @@ public class ExoUtil {
 
     }
 
-    //2.6、解析exoList返回段对象
+    /**
+     * 2.9、解析exoList返回段对象
+     *
+     * @param exoList
+     * @param anmName
+     * @return
+     */
     public static List<AviutlExo>  addAnmEffect(List<AviutlExo>  exoList,String anmName) {
         List<AviutlExo> partExoList = exoList;
         List<AviutlExo> newExoList = new ArrayList<>();

@@ -18,6 +18,16 @@ const routes = [
     path: '/xml',
     name: 'xml',
     component: () => import('@/views/xml.vue')
+  },
+  {
+    path: '/ascii-text',
+    name: 'ascii-text',
+    component: () => import('@/views/ascii-text.vue')
+  },
+  {
+    path: '/guide',
+    name: 'guide',
+    component: () => import('@/views/index.vue')
   }
 ]
 
