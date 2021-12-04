@@ -117,6 +117,33 @@ public class CubicBezierUtil {
         return cubicBezierList;
     }
 
+    public static List<CubicBezier> parseCubicByTimes(String cubicStr, Integer times){
+        List<Position> positionList = parseCubicStr(cubicStr);
+        List<CubicBezier> cubicBezierList = new ArrayList<>();
+
+//        int frame = 33;
+        double p1x = positionList.get(0).getX();
+        double p1y = positionList.get(0).getY();
+        double p2x = positionList.get(1).getX();
+        double p2y = positionList.get(1).getY();
+
+        double  ay = 3 * p1y - 3 * p2y + 1,
+                by = 3 * p2y - 6 * p1y,
+                cy = 3 * p1y;
+        double xTarget = 0.1;
+
+        int n = times;
+        for(int i = 0; i <= n; i++){
+            xTarget = NumberUtil.div(i,n);
+            double t = newtonMethod(xTarget, p1x, p1y, p2x, p2y);
+            double y = ((ay * t + by) * t + cy ) * t;
+            double progression = NumberUtil.round(y,4).doubleValue();
+            cubicBezierList.add(new CubicBezier(xTarget, progression));
+        }
+
+        return cubicBezierList;
+    }
+
 
     /**
      * 在已知 x 的情况下求 t

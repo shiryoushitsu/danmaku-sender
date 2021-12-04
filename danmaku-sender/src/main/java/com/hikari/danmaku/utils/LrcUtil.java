@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.hikari.danmaku.utils.CommonUtil.codeString;
+
 
 /**
  * create by AwaiHikari on 2020-07-01 20:50
@@ -759,6 +761,48 @@ public class LrcUtil {
         return assList;
     }
 
+    //解析txt返回danmaku实体类列表【0104】
+    public static  List<Ass>  txtToDanmakuList(String path)  {
+        String encoding = "utf-8"; // 字符编码，若与歌词文件编码不符将会出现乱码
+        String lyr2 = "";
+
+        try{
+            File file = new File(path);
+            if (file.isFile() && file.exists()) { // 判断文件是否存在
+                encoding = codeString(file);
+
+                InputStreamReader read = new InputStreamReader(new FileInputStream(file), encoding);
+                BufferedReader bufferedReader = new BufferedReader(read);
+                String lineStr = null; // 每次读取一行字符串
+                while ((lineStr = bufferedReader.readLine()) != null) {
+                    if (lineStr != null && !lineStr.isEmpty()) {
+                        lyr2 += lineStr +"\n";
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("读取文件出错!");
+            e.printStackTrace();
+        }
+        //获取歌词文本
+        String lyr = lyr2;
+
+        List<Ass> assBeans = new ArrayList<>();//存放歌词
+        String[] split = lyr.split("\\n");//分割
+        if (split.length == 1) split = lyr.split("\\\\n");
+
+        for (String s : split) {
+            Ass ass = parseTxtLine(s);  //【解析重点】
+            if (ass != null && !"".equals(ass.getContent())) {
+                assBeans.add(ass);
+            }
+        }
+        String contentLrc = "";
+        for (int ii = 0 ; ii< assBeans.size() ; ii++) {
+            contentLrc +=  assBeans.get(ii).getStartTimeString() + "--" + assBeans.get(ii).getEndTimeString() + "--"+ assBeans.get(ii).getContent() + "\n";
+        }
+        return assBeans;
+    }
 
 //    //解析txt返回二维数组【20210719】
 //    public static  List<List<String>> txtToList(String path)  {

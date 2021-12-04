@@ -12,6 +12,9 @@ public class XmlEffect {
     @ApiModelProperty("是否实现层级效果（用z轴来增加时间，用时间覆盖来实现层级效果）")
     private boolean isLayer;
 
+    @ApiModelProperty("是否换行都转成新文本（距离默认字号）")
+    private boolean isForceLine;
+
     @ApiModelProperty("是否线性加速")
     private boolean isLinearSpeedup;
 

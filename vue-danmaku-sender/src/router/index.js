@@ -20,6 +20,11 @@ const routes = [
     component: () => import('@/views/xml.vue')
   },
   {
+    path: '/ascii',
+    name: 'ascii',
+    component: () => import('@/views/ascii.vue')
+  },
+  {
     path: '/ascii-text',
     name: 'ascii-text',
     component: () => import('@/views/ascii-text.vue')

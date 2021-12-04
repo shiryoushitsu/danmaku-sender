@@ -4,6 +4,7 @@ import cn.hutool.core.io.file.FileReader;
 import com.alibaba.fastjson.JSONObject;
 import com.hikari.danmaku.common.Response;
 import com.hikari.danmaku.common.ResponseResult;
+import com.hikari.danmaku.constants.Font;
 import com.hikari.danmaku.service.intf.IDanmakuService;
 import com.hikari.danmaku.service.intf.IFileService;
 import com.hikari.danmaku.service.intf.ILogService;
@@ -60,8 +61,16 @@ public class ToolController {
     @ApiOperation("生成字符字")
     @GetMapping("/asciiText")
     public ResponseResult getConfig(@RequestParam("content") String content ,@RequestParam("font") String font) throws Exception {
-        FontFamily fontFamily = new FontFamily();
-        String str =  AsciiUtil.getFontAscii(content,fontFamily);
+        FontFamily fontFamily = new FontFamily("方正像素16", 16,16 ,16);
+
+        //循环字体枚举类
+        for (Font fontEnum : Font.values()) {
+           if(fontEnum.getName().equals(font)) {
+               fontFamily = new FontFamily(fontEnum.getName(), fontEnum.getSize(), fontEnum.getHeight(),fontEnum.getWidth());
+           }
+        }
+
+        String str = AsciiUtil.getFontAscii(content, fontFamily);
         JSONObject rspJson = new JSONObject();
         rspJson.put("asciiText", str);
         return Response.makeOKRsp(rspJson);

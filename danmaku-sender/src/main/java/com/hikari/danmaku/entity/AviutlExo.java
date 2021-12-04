@@ -67,8 +67,21 @@ public class AviutlExo {
     @ApiModelProperty("结束Y坐标")
     private Integer endY;
 
+    @ApiModelProperty("中心X坐标")
+    private Integer centerX;
+
+    @ApiModelProperty("中心Y坐标")
+    private Integer centerY;
+
+
     @ApiModelProperty("Z轴旋转")
     private Integer ZRotation;
+
+    @ApiModelProperty("Z轴旋转结束")
+    private Integer endZRotation;
+
+    @ApiModelProperty("Z轴旋转缓动")
+    private Integer easingZRotation;
 
     @ApiModelProperty("字体")
     private String font;
@@ -100,10 +113,18 @@ public class AviutlExo {
     @ApiModelProperty("对齐方式")
     private Integer align;
 
+    @ApiModelProperty("文本字数")
+    private Integer textLength;
+
+    @ApiModelProperty("处理状态（是否删除 1正常 0删除）")
+    private Integer state = 1;
 
 //    额外扩展效果
     @ApiModelProperty("阴影/复制文本对象操作")
     private Integer shadow = 0;
+
+    @ApiModelProperty("描边效果")
+    private AulOutline aulOutline;
 
     @ApiModelProperty("阴影效果")
     private AulShadow aulShadow;

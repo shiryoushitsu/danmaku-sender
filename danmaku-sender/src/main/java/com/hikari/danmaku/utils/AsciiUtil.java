@@ -1,14 +1,16 @@
 package com.hikari.danmaku.utils;
 
 
+import cn.hutool.core.io.file.FileReader;
+import cn.hutool.core.io.file.FileWriter;
 import com.hikari.danmaku.entity.FontFamily;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static com.hikari.danmaku.utils.ColorUtil.convertRGBToHex;
@@ -16,9 +18,53 @@ import static com.hikari.danmaku.utils.ColorUtil.convertRGBToHex;
 
 public class AsciiUtil {
     public static void main(String []args) {
-        checkEnvironmentFont();
-        FontFamily fontFamily = new FontFamily();
-        getFontAscii("梦想", fontFamily);
+
+        //正文字
+//        List<List<String>> arrayList = txtToList("D:\\弹.txt");
+//        List<List<String>> arrayList = txtToList("D:\\正LOVE.txt");
+
+        List<List<String>> arrayList = txtToList("D:\\正bilibili干杯.txt");
+        List<List<String>> revolveList = revolveList(arrayList);
+        List<List<String>> blockReverse = blockReverse(revolveList);
+
+
+//        arrayList = exchangeList(arrayList);
+
+//        for(int i = 0 ;i < arrayList.size();i++){
+//            List<String> lineList = arrayList.get(arrayList.size() - i - 1);
+//            String line = "";
+//            for(int j = 0 ;j < lineList.size();j++){
+//                line = line + lineList.get(lineList.size() - j - 1);
+//            }
+//            System.out.println(line);
+//        }
+
+
+//        Collections.reverse(arrayList);
+//
+//        System.out.println(arrayList);
+
+        for(List<String>  lineStr : revolveList){
+            String line = "";
+            for(String str : lineStr){
+                line = line + str;
+            }
+            System.out.println(line);
+        }
+
+        for(List<String>  lineStr : blockReverse){
+            String line = "";
+            for(String str : lineStr){
+                line = line + str;
+
+            }
+            System.out.println(line);
+        }
+
+
+//        checkEnvironmentFont();
+//        FontFamily fontFamily = new FontFamily();
+//        getFontAscii("梦想", fontFamily);
 //      String path="D:\\kbw.png";
 //      getBlackWhite(path);
     }
@@ -35,9 +81,9 @@ public class AsciiUtil {
     //检查系统可用字体
     public static String getFontAscii(String text, FontFamily fontFamily){
         String content = text;
-        BufferedImage image = new BufferedImage(content.length()*16, 16, BufferedImage.TYPE_INT_RGB);
+        BufferedImage image = new BufferedImage(content.length() * fontFamily.getFontWidth(), fontFamily.getFontHeight(), BufferedImage.TYPE_INT_RGB);
         Graphics2D g = image.createGraphics();
-        g.setFont(new Font("方正像素16", Font.PLAIN, 16));
+        g.setFont(new Font(fontFamily.getFont(), Font.PLAIN, fontFamily.getFontSize()));
         g.drawString(content, 0, image.getHeight() - 2);
         int [] p = image.getRGB(0, 0, image.getWidth(), image.getHeight(), new int[image.getWidth()*image.getHeight()], 0, image.getWidth());
         StringBuffer stringBuffer = new StringBuffer();
@@ -114,4 +160,78 @@ public class AsciiUtil {
 
     }
 
+
+    /**
+     * 解析txt返回二维数组
+     */
+    public static  List<List<String>> txtToList(String path)  {
+        List<List<String>> arrayList = new ArrayList<>();
+        FileReader fileReader = new FileReader(path);
+        List<String> linesList =  fileReader.readLines();
+        for (String line : linesList){
+            List<String> stringList = new ArrayList<>();
+            for(int i = 0 ;i < line.length();i++){
+                stringList.add(String.valueOf(line.charAt(i)));
+            }
+            arrayList.add(stringList);
+        }
+        return arrayList;
+    }
+
+    /**
+     * 二维组180度翻转
+     */
+    public static  List<List<String>> revolveList(List<List<String>> txtList)  {
+        List<List<String>> arrayList = new ArrayList<>();
+        for(int i = 0 ;i < txtList.size();i++){
+            List<String> newList = new ArrayList<>();
+            List<String> lineList = txtList.get(txtList.size() - i - 1);
+            for(int j = 0 ;j < lineList.size();j++){
+                newList.add(lineList.get(lineList.size() - j - 1));
+            }
+            arrayList.add(newList);
+        }
+        return arrayList;
+    }
+
+    /**
+     * 空格与黑色块互转
+     */
+    public static List<List<String>> blockReverse(List<List<String>> txtList)  {
+        List<List<String>> arrayList = new ArrayList<>();
+        for(int i = 0 ;i < txtList.size(); i++){
+            List<String> newList = new ArrayList<>();
+            List<String> lineList = txtList.get(i);
+            for(int j = 0 ;j < lineList.size();j++){
+                String textChar = lineList.get(j);
+                if("　".equals(textChar)){
+                    textChar = "█";
+                }else if("█".equals(textChar)){
+                    textChar = "　";
+                }
+                newList.add(textChar);
+            }
+            arrayList.add(newList);
+        }
+        return arrayList;
+    }
+
+
+    /**
+     * 二维行列替换
+     */
+    public static  List<List<String>> exchangeList(List<List<String>> txtList)  {
+        int length = txtList.get(0).size();//长
+        int width = txtList.size();//宽
+        List<List<String>>  exchangeArrayList  = new ArrayList<>();
+        for(int i = 0;i<length;i++){
+            List<String>  subExchangeArrayList  = new ArrayList<>();
+            for(int j = 0;j<width;j++){
+                String y = txtList.get(j).get(i).toString();
+                subExchangeArrayList.add(y);
+            }
+            exchangeArrayList.add(subExchangeArrayList);
+        }
+        return exchangeArrayList;
+    }
 }

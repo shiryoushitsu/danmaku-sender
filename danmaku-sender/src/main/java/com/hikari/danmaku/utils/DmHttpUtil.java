@@ -22,20 +22,19 @@ public class DmHttpUtil {
         String sessdata = sendDanmakuVO.getCookie();
         String csrf = sendDanmakuVO.getCsrf();
         String bvid = sendDanmakuVO.getBvid();
-        if(sessdata != null  ) { sessdata =  sessdata.trim(); }
-        if(csrf != null  ) {  csrf = csrf.trim(); }
-        if(bvid != null  ) {  bvid = bvid.trim(); }
+        if(sessdata != null ) { sessdata =  sessdata.trim(); }
+        if(csrf != null ) {  csrf = csrf.trim(); }
+        if(bvid != null ) {  bvid = bvid.trim(); }
 
         PostMethod postMethod = new PostMethod(dmPostUrl) ;
         postMethod.setRequestHeader("Content-Type", "application/x-www-form-urlencoded") ;
         postMethod.setRequestHeader("Cookie",  "SESSDATA=" + sessdata) ;
         postMethod.setRequestHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36") ;
-//        postMethod.setRequestHeader("Referer", "https://www.bilibili.com/video/BV1Z54y1S7wN?p=2") ;
-        //预处理
-        ////时间戳
+
+        //时间戳
         String timestampPlus = Long.toString(System.currentTimeMillis()/1000L) + "000000";
 
-        ////弹幕出现时间（毫秒）
+        //弹幕出现时间（毫秒）
         String progress = String.valueOf(startTimes);
         String color = ColorUtil.hexto10(sendDanmakuVO.getColor());
 
@@ -60,13 +59,9 @@ public class DmHttpUtil {
         httpClient.executeMethod(postMethod);
         String result = postMethod.getResponseBodyAsString() ;
 
-
         JSONObject jsonObjectP = JSON.parseObject(result);
         int code = Integer.valueOf(jsonObjectP.getString("code")) ;
         String message = jsonObjectP.getString("message");
-//        ResponseResult responseResult = new ResponseResult;
-//        responseResult.setCode(code);
-//        responseResult.setMsg(message);
 
         return  Response.makeRsp(code,message);
     }
@@ -89,7 +84,6 @@ public class DmHttpUtil {
             httpClient.executeMethod(getMethod);
             String result = getMethod.getResponseBodyAsString();
             getMethod.releaseConnection();
-//            logger.info("返回信息为{}", result);
             return result;
         } catch (IOException e) {
         }

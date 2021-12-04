@@ -108,7 +108,7 @@ public class ColorUtil {
     }
 
     //正式-传3个参数返回16进制颜色代码
-    public static  String  hsv2rgb(int hue, double sat, double val ) {
+    public static  String hsv2rgb(int hue, double sat, double val ) {
         String result="";
         float[] hsb = new float[3];
         hsb[0] = (float)hue;
@@ -128,6 +128,9 @@ public class ColorUtil {
         String c10 = "16777215";
         long dec_num = Long.parseLong(hex_num, 16);
         c10 = String.valueOf(dec_num);
+        if("0".equals(c10)){
+            c10 = "1";
+        }
         return c10;
     }
 
@@ -136,6 +139,13 @@ public class ColorUtil {
         String hex= Integer.toHexString(numb);
         return hex;
     }
+
+    //hex颜色去掉0x
+    public static String cutColor(String hexColor) {
+        String[] colorArray = hexColor.split("x");
+        return colorArray[1];
+    }
+
 
     private static final int RED_YELLOW = 1;
     private static final int YELLOW_GREEN = 2;
@@ -148,18 +158,14 @@ public class ColorUtil {
 
     public static Color transformHSVtoRGB(final int hue, final float sat, final float val) {
         if (hue < 0 || hue > HUE_MAX) {
-            throw new IllegalArgumentException("hue needs to be between"
-                    + " 0 and 360");
+            throw new IllegalArgumentException("hue needs to be between" + " 0 and 360");
         }
         if (sat < 0.0 || sat > 1.0) {
-            throw new IllegalArgumentException(
-                    "saturation needs to be between" + " 0.0 and 1.0");
+            throw new IllegalArgumentException("saturation needs to be between" + " 0.0 and 1.0");
         }
         if (val < 0.0 || val > 1.0) {
-            throw new IllegalArgumentException("value needs to be between"
-                    + " 0.0 and 1.0");
+            throw new IllegalArgumentException("value needs to be between" + " 0.0 and 1.0");
         }
-
         int h = (int) (hue / HUE_SPLIT);
         float f = (hue / HUE_SPLIT) - h;
         float p = val * (1 - sat);

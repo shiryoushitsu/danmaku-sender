@@ -2,14 +2,23 @@
   <div> 
 
   <div style="display: flex;justify-content: center;">
-    <el-card style="width:1000px;min-height:100px;margin-top:22px;" > 
+    <el-card style="width:1000px;min-height:60px;margin-top:22px;" > 
       <el-form ref="form" :model="form" label-width="80px" :rules="rules" :hide-required-asterisk="true" :validate-on-rule-change="false">
         
-      <el-row>
-          <el-col :span="21">
-          <el-form-item size="middle" label="" prop="content" label-width="0px">
-          <el-input v-model="form.content"  placeholder="文字"  />
-        </el-form-item>
+      <el-row :gutter="2">
+          <el-col :span="16">
+       <el-input v-model="form.content"  placeholder="文字" />
+          </el-col>
+          <el-col :span="5">
+    
+               <el-select v-model="form.font"  placeholder="请输入文字" >
+            <el-option
+              v-for="item in options"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
           </el-col>
           <el-col :span="3">
                   <el-button @click="submitForm()">生成字符字</el-button>
@@ -26,7 +35,7 @@
   </div>
   <div style="display: flex;justify-content: center;">
     <!-- 日志区 --> 
-    <el-card style="width:1000px;min-height:400px;margin-top:22px;"> 
+    <el-card style="width:1000px;min-height:300px;margin-top:22px;"> 
       <el-input class="output" type="textarea" :rows="2" placeholder="显示区域" v-model="textarea" :autosize="{ minRows: 18, maxRows: 20}"> 
       </el-input> 
     </el-card> 
@@ -64,10 +73,34 @@ export default {
   data() {
     return {
       value1:'', 
+      value:'', 
       form:{
         content: '',
-        font: '25',
+        font: '方正像素16',
       },
+      options: [{
+        value: '方正像素16',
+        label: '方正像素16'
+      }, {
+        value: '微软雅黑',
+        label: '微软雅黑'
+      }, {
+        value: '黑体',
+        label: '黑体'
+      }, {
+        value: 'JF Dot K12',
+        label: 'JF-Dot-K12'
+      }, {
+        value: 'JF Dot M+ 10',
+        label: 'JF-Dot-MPlus10(日)'
+      }, {
+        value: 'JF Dot NagaMin 10',
+        label: 'JF-Dot-Naga10(日)'
+      }, {
+        value: 'Zpix',
+        label: 'Zpix'
+      }],
+      // options: ["方正像素16", "微软雅黑", "黑体","JF-Dot-K12", "JF-Dot-MPlus10", "JF-Dot-Naga10","Zpix"],
       rules: {     // 表单校验
         // cookie: [
         //   { required: true, message: "发送时cookie不能为空" }
@@ -137,6 +170,9 @@ textarea {
   font-family: SimHei !important;
 
 }
+el-form-item{ margin-bottom: 0px;}
+
+
 
 .el-textarea__inner{
   line-height: 1 !important;
