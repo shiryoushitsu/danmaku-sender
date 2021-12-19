@@ -4,6 +4,7 @@ public enum Font {
     FANGZHEN("方正像素16", 16,16,16),
     YAHEI("微软雅黑", 16,15,17),
     SIMHEI("黑体", 16,15,17),
+    JFDOTJISKAN24("JF Dot jiskan24", 24,24,25),
     JFDOTK12("JF Dot K12", 12,12,13),
     JFDOTMPLUS10("JF Dot M+ 10", 10,11,10),
     JFDOTNAGA10("JF Dot NagaMin 10", 10,11,11),

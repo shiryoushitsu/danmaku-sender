@@ -425,7 +425,7 @@
         placeholder="发送日志显示区域"
         v-model="textarea"
         :autosize="{ minRows: 26, maxRows: 26}"
-
+        wrap="off"
         >
       </el-input>
     </el-card>
@@ -679,6 +679,7 @@ export default {
     // 关闭轮询
     stopSetInterval() {
       if (this.timer) {
+        console.log("关闭查询日志轮训")
         clearInterval(this.timer)
         this.timer = null
       }

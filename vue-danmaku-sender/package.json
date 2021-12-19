@@ -11,6 +11,7 @@
     "axios": "^0.23.0",
     "core-js": "^3.6.5",
     "element-ui": "^2.15.6",
+    "file-saver": "^2.0.5",
     "vue": "^2.6.11",
     "vue-axios": "^3.3.7",
     "vue-router": "^3.5.2",

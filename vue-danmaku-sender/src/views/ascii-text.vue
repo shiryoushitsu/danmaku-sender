@@ -6,19 +6,28 @@
       <el-form ref="form" :model="form" label-width="80px" :rules="rules" :hide-required-asterisk="true" :validate-on-rule-change="false">
         
       <el-row :gutter="2">
-          <el-col :span="16">
+          <el-col :span="13">
        <el-input v-model="form.content"  placeholder="文字" />
           </el-col>
-          <el-col :span="5">
-    
-               <el-select v-model="form.font"  placeholder="请输入文字" >
-            <el-option
-              v-for="item in options"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-          </el-select>
+            <el-col :span="4">
+              <el-select v-model="form.isChar"  placeholder="换行" >
+                <el-option
+                  v-for="item in lineOptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+          </el-col>
+          <el-col :span="4">
+            <el-select v-model="form.font"  placeholder="请输入文字" >
+              <el-option
+                v-for="item in options"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
           </el-col>
           <el-col :span="3">
                   <el-button @click="submitForm()">生成字符字</el-button>
@@ -34,9 +43,9 @@
     </el-card> 
   </div>
   <div style="display: flex;justify-content: center;">
-    <!-- 日志区 --> 
-    <el-card style="width:1000px;min-height:300px;margin-top:22px;"> 
-      <el-input class="output" type="textarea" :rows="2" placeholder="显示区域" v-model="textarea" :autosize="{ minRows: 18, maxRows: 20}"> 
+    <!-- 显示区 --> 
+    <el-card style="width:1000px;min-height:400px;margin-top:22px;"> 
+      <el-input class="output" type="textarea" :rows="2" placeholder="显示区域" v-model="textarea" :autosize="{ minRows: 24, maxRows: 26}"> 
       </el-input> 
     </el-card> 
   </div>
@@ -46,6 +55,7 @@
 
 <script>
 import qs from 'qs'
+import {saveAs} from 'file-saver'
 export default {
   name: 'Home',
   components: {
@@ -76,6 +86,7 @@ export default {
       value:'', 
       form:{
         content: '',
+        isChar: 'true',
         font: '方正像素16',
       },
       options: [{
@@ -88,6 +99,10 @@ export default {
         value: '黑体',
         label: '黑体'
       }, {
+        value: 'JF Dot jiskan24',
+        label: 'JF-Dot-jiskan24'
+      },
+      {
         value: 'JF Dot K12',
         label: 'JF-Dot-K12'
       }, {
@@ -100,7 +115,14 @@ export default {
         value: 'Zpix',
         label: 'Zpix'
       }],
-      // options: ["方正像素16", "微软雅黑", "黑体","JF-Dot-K12", "JF-Dot-MPlus10", "JF-Dot-Naga10","Zpix"],
+      lineOptions: [{
+        value: 'true',
+        label: '逐字换行'
+      }, {
+        value: 'false',
+        label: '一行文字'
+      }
+      ],
       rules: {     // 表单校验
         // cookie: [
         //   { required: true, message: "发送时cookie不能为空" }
@@ -115,7 +137,6 @@ export default {
       textarea: '',
       txtFile: null,
       requestId: '',
-      timerStatus: 0,
       timer: null, //轮询器
       uploadName: '请上传lrc或ass文件',
       activeName: 'first',
@@ -128,27 +149,19 @@ export default {
         if (valid) {
           let _this = this;
           this.textarea = ''
-          let params = new FormData()
-          for(let key in this.form){
-            if(this.form[key] != null){
-              params.append(key,this.form[key])
-            }
-          }
           let config = {
               headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8' }
           }
           this.axios.get('/tool/asciiText', {
-            params:
-          {content:this.form.content,
-          font:this.form.font,
-          }
-          
+            params: {content:this.form.content, font:this.form.font,isChar:this.form.isChar}
           }, config).then(res => {
             if(res.data.code == 200){
-                this.textarea = res.data.data.asciiText
-                console.log(this.textarea);
-              this.timerStatus = 0;
-
+              this.textarea = res.data.data.asciiText
+              console.log(this.textarea);
+              // var data = res.data.data.asciiText
+              // let str = new Blob([data], {type: 'text/plain;charset=utf-8'});
+              // // 注意这里要手动写上文件的后缀名
+              // saveAs(str, `文件一.txt`);
             }
           }).catch(function (error) {
             console.log(error);

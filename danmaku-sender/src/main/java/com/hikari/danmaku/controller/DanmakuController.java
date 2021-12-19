@@ -123,7 +123,7 @@ public class DanmakuController {
         long startRecord = DateUtil.getNowDate().getTime();
         int randomTime = 0;
         for (int j = startRow; j <= lrcCount; j++) {
-            Random random =new Random();
+            Random random = new Random();
             if(sendDanmakuM1Vo.getSendRandomTime() > 0){
                 randomTime = random.nextInt(sendDanmakuM1Vo.getSendRandomTime());
             }

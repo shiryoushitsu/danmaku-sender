@@ -30,6 +30,16 @@ const routes = [
     component: () => import('@/views/ascii-text.vue')
   },
   {
+    path: '/lrc-exo',
+    name: 'lrc-exo',
+    component: () => import('@/views/lrc-exo.vue')
+  },
+  {
+    path: '/exo-xml',
+    name: 'exo-xml',
+    component: () => import('@/views/exo-xml.vue')
+  },
+  {
     path: '/guide',
     name: 'guide',
     component: () => import('@/views/index.vue')

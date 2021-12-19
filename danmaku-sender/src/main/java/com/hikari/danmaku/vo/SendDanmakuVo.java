@@ -58,7 +58,7 @@ public class SendDanmakuVo extends SeniorDanmaku {
     @ApiModelProperty("附加随机时间")
     private Integer sendRandomTime;
 
-    @ApiModelProperty("附加随机时间")
+    @ApiModelProperty("重发时间")
     private Integer sendRetryInterval;
 
 }

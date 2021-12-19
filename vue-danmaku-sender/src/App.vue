@@ -28,6 +28,7 @@ export default {
 body {
   margin: 0px;
   padding: 0px;
+  background-color: #F8FAFB;
 }
 #app{
   height:100vh;

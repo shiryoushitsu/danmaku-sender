@@ -44,7 +44,9 @@ public class DanmakuService implements IDanmakuService {
                 vo.setContent(vo.getContent() + suffixContent );
             }
         }
-
+        if(sendDanmakuM1Vo.getSendRetryInterval() == null){
+            sendDanmakuM1Vo.setSendRetryInterval(1);
+        }
 
         // 根据bvid + pardId获取视频信息
         if(StringUtils.isBlank(sendDanmakuM1Vo.getBvid())){
@@ -90,7 +92,9 @@ public class DanmakuService implements IDanmakuService {
         if(sendDanmakuM7Vo.getOverlapTime() == null){
             sendDanmakuM7Vo.setOverlapTime(0);
         }
-
+        if(sendDanmakuM7Vo.getSendRetryInterval() == null){
+            sendDanmakuM7Vo.setSendRetryInterval(1);
+        }
 
         //处理前缀附加内容
 //        if(!sendDanmakuM1Vo.getSendPrefix().isEmpty()){

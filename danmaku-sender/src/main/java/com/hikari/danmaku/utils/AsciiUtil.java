@@ -18,48 +18,32 @@ import static com.hikari.danmaku.utils.ColorUtil.convertRGBToHex;
 
 public class AsciiUtil {
     public static void main(String []args) {
-
+        checkEnvironmentFont();
         //正文字
 //        List<List<String>> arrayList = txtToList("D:\\弹.txt");
 //        List<List<String>> arrayList = txtToList("D:\\正LOVE.txt");
 
-        List<List<String>> arrayList = txtToList("D:\\正bilibili干杯.txt");
-        List<List<String>> revolveList = revolveList(arrayList);
-        List<List<String>> blockReverse = blockReverse(revolveList);
-
-
-//        arrayList = exchangeList(arrayList);
-
-//        for(int i = 0 ;i < arrayList.size();i++){
-//            List<String> lineList = arrayList.get(arrayList.size() - i - 1);
+//        List<List<String>> arrayList = txtToList("D:\\正bilibili干杯.txt");
+//        List<List<String>> revolveList = revolveList(arrayList);
+//        List<List<String>> blockReverse = blockReverse(revolveList);
+//
+//
+//        for(List<String>  lineStr : revolveList){
 //            String line = "";
-//            for(int j = 0 ;j < lineList.size();j++){
-//                line = line + lineList.get(lineList.size() - j - 1);
+//            for(String str : lineStr){
+//                line = line + str;
 //            }
 //            System.out.println(line);
 //        }
-
-
-//        Collections.reverse(arrayList);
 //
-//        System.out.println(arrayList);
-
-        for(List<String>  lineStr : revolveList){
-            String line = "";
-            for(String str : lineStr){
-                line = line + str;
-            }
-            System.out.println(line);
-        }
-
-        for(List<String>  lineStr : blockReverse){
-            String line = "";
-            for(String str : lineStr){
-                line = line + str;
-
-            }
-            System.out.println(line);
-        }
+//        for(List<String>  lineStr : blockReverse){
+//            String line = "";
+//            for(String str : lineStr){
+//                line = line + str;
+//
+//            }
+//            System.out.println(line);
+//        }
 
 
 //        checkEnvironmentFont();

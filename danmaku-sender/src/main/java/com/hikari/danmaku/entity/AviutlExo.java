@@ -132,5 +132,10 @@ public class AviutlExo {
     @ApiModelProperty("动画效果")
     private List<AulAnmEffect> aulAnmEffectList;
 
+    @ApiModelProperty("当前名")
+    private String currentName;
+
+    @ApiModelProperty("全局基本效果")
+    private XmlEffect xmlEffect;
 
 }

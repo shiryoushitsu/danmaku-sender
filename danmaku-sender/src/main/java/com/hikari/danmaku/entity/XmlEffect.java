@@ -7,25 +7,33 @@ import lombok.Data;
 public class XmlEffect {
 
     @ApiModelProperty("是否描边")
-    private boolean isOutline;
+    private boolean isOutline = false;
 
     @ApiModelProperty("是否实现层级效果（用z轴来增加时间，用时间覆盖来实现层级效果）")
-    private boolean isLayer;
+    private boolean isLayer = true;
 
     @ApiModelProperty("是否换行都转成新文本（距离默认字号）")
-    private boolean isForceLine;
+    private boolean isForceLine = false;
 
     @ApiModelProperty("是否线性加速")
-    private boolean isLinearSpeedup;
+    private boolean isLinearSpeedup = false;
 
     @ApiModelProperty("是否坐标百分比")
-    private boolean isPercentage;
+    private boolean isPercentage = true;
 
     @ApiModelProperty("是否提前开始时间（提前50ms，解决连续两段弹幕之间闪烁问题）")
-    private boolean isAdvanceStartTime;
+    private boolean isAdvanceStartTime = false;
 
     @ApiModelProperty("是否延长结束时间（延长50ms，解决连续两段弹幕之间闪烁问题）")
-    private boolean isDelayEndTime;
+    private boolean isDelayEndTime = false;
 
+    @ApiModelProperty("是否十进制颜色")
+    private boolean isColor10 = true;
+
+    @ApiModelProperty("是否中间点强制分句")
+    private boolean isPointCut = false;
+
+    @ApiModelProperty("")
+    private int ZrotationTimes = 10;
 
 }

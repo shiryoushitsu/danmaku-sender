@@ -5,10 +5,11 @@ import com.alibaba.fastjson.JSONObject;
 import com.hikari.danmaku.common.Response;
 import com.hikari.danmaku.common.ResponseResult;
 import com.hikari.danmaku.constants.Font;
+
 import com.hikari.danmaku.service.intf.IDanmakuService;
 import com.hikari.danmaku.service.intf.IFileService;
 import com.hikari.danmaku.service.intf.ILogService;
-import com.hikari.danmaku.utils.AsciiUtil;
+import com.hikari.danmaku.utils.*;
 import com.hikari.danmaku.entity.FontFamily;
 import com.hikari.danmaku.vo.SendDanmakuM7Vo;
 import io.swagger.annotations.Api;
@@ -38,6 +39,9 @@ public class ToolController {
     @Autowired
     private IDanmakuService danmakuService;
 
+    private static Integer screenWidth =  0;
+
+    private static Integer screenHigh =  1;
 
     @ApiOperation("获取视频弹幕xml文件")
     @GetMapping("/getVideoDanmakuXml")
@@ -60,7 +64,7 @@ public class ToolController {
 
     @ApiOperation("生成字符字")
     @GetMapping("/asciiText")
-    public ResponseResult getConfig(@RequestParam("content") String content ,@RequestParam("font") String font) throws Exception {
+    public ResponseResult getConfig(@RequestParam("content") String content ,@RequestParam("font") String font, @RequestParam("isChar") String isChar) throws Exception {
         FontFamily fontFamily = new FontFamily("方正像素16", 16,16 ,16);
 
         //循环字体枚举类
@@ -69,13 +73,20 @@ public class ToolController {
                fontFamily = new FontFamily(fontEnum.getName(), fontEnum.getSize(), fontEnum.getHeight(),fontEnum.getWidth());
            }
         }
+        String str = "";
+        if("true".equals(isChar)){
+            // 逐字换行
+            for(int i = 0;i < content.length();i++){
+                String word = String.valueOf(content.charAt(i));
+                str = str + AsciiUtil.getFontAscii(word, fontFamily) + "\n";
+            }
+        }else {
+            str = AsciiUtil.getFontAscii(content, fontFamily);
+        }
 
-        String str = AsciiUtil.getFontAscii(content, fontFamily);
         JSONObject rspJson = new JSONObject();
         rspJson.put("asciiText", str);
         return Response.makeOKRsp(rspJson);
     }
-
-
 
 }

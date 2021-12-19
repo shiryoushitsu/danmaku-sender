@@ -15,7 +15,12 @@ import java.util.regex.Pattern;
  */
 public class CoordinateUtil {
     public static void main(String[] args) {
-        System.out.println();
+        List<Vector> vector = path2Vector("m 800 105 l 499 102 l 652 104 ");
+        String vPath = "";
+        for(Vector v : vector){
+            vPath =  vPath + v.getStr().toUpperCase() + "" +  Math.round(v.getPosition().get(0).getX()) +"," +Math.round(v.getPosition().get(0).getY());
+        }
+        System.out.println( vPath );
     }
 
     /**

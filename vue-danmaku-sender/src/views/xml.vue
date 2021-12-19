@@ -184,7 +184,7 @@
      <el-col :span="12"> 
       <el-card style="width:600px;float:left;min-height:600px"> 
        <span></span> 
-       <el-input type="textarea" :rows="2" placeholder="发送日志显示区域" v-model="textarea" :autosize="{ minRows: 26, maxRows: 26}" style=""> 
+       <el-input type="textarea" wrap="off" :rows="2" placeholder="发送日志显示区域" v-model="textarea" :autosize="{ minRows: 26, maxRows: 26}" style=""> 
        </el-input> 
       </el-card> 
      </el-col> 
@@ -397,6 +397,7 @@ export default {
     // 关闭轮询
     stopSetInterval() {
       if (this.timer) {
+        console.log("关闭查询日志轮训")
         clearInterval(this.timer)
         this.timer = null
       }

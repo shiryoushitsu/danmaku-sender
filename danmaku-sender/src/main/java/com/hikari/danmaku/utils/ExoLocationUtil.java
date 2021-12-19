@@ -5,18 +5,30 @@ import cn.hutool.core.util.NumberUtil;
 import com.hikari.danmaku.constants.Easing;
 import com.hikari.danmaku.entity.*;
 import org.springframework.beans.BeanUtils;
+
 import java.io.*;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
 import static com.hikari.danmaku.utils.CommonUtil.*;
 
-public class ExoUtil {
+public class ExoLocationUtil {
+
+    final private static double frameSecond = 0.033;
+    private static Integer screenWidth =  0;
+    private static Integer screenHeight =  0;
+    private static String currentName =  "";
+    private static Integer currentChain =  0;
+    private static Integer colorHex10 =  1;
+    private static XmlEffect currentTXmlEffect ;
+    private static Integer ZrotationTimes = 10 ;
+
 
     // 15寸 760 510  38.8% / 14寸 850 560 43.4% /1px约等于0.002百分比
     public static void main(String[] args) {
-        String fileName = "路径跟随";
+        String fileName = "额外";
 //        String fileName = "hello闪字";
         String inputExoPath = "C:\\Users\\hikari\\Desktop\\"+  fileName+ ".exo";
         String outputXmlPath = "C:\\Users\\hikari\\Desktop\\"+ fileName +".xml";
@@ -29,18 +41,16 @@ public class ExoUtil {
         XmlEffect.setDelayEndTime(true);
         XmlEffect.setForceLine(false);//是否换行都转成新文本
         XmlEffect.setPercentage(true);//是否百分比
-        XmlEffect.setColor10(false);
 
-        XmlEffect.setPointCut(true);
 //        XmlEffect.setForceLine(true);//是否换行都转成新文本（m7滚动配置）
 //        XmlEffect.setPercentage(false);//使用px（m7滚动配置）
-//             XmlEffect;
+        currentTXmlEffect = XmlEffect;
 
         //1.解析exo文本返回分段List
         List<Map<String,String>> exoList = parseExoToList(inputExoPath);
 
         //2.将分段List优化为exo对象list
-        List<AviutlExo> exoObjectList = parseExoList(exoList, XmlEffect);
+        List<AviutlExo> exoObjectList = parseExoList(exoList);
 
         //3.将处理好的exo对象list转为m7xml
         String xmlStr = exoToXml(exoObjectList);
@@ -110,8 +120,7 @@ public class ExoUtil {
      * @param exoList
      * @return
      */
-    public static List<AviutlExo> parseExoList(List<Map<String, String>>exoList, XmlEffect xmlEffect) {
-        int screenWidth = 0, screenHeight = 0;
+    public static List<AviutlExo> parseExoList(List<Map<String, String>>exoList) {
 
         List<AviutlExo> partExoList =  new ArrayList<>();
         AviutlExo curExoVO = new AviutlExo();
@@ -121,11 +130,6 @@ public class ExoUtil {
             //不包含点的，即主段
             if(!exoListMap.get("partName").contains(".")){
                 AviutlExo exoVO = new AviutlExo();
-                //全局配置
-                exoVO.setXmlEffect(xmlEffect);
-                exoVO.setWidth(screenWidth);
-                exoVO.setHeight(screenHeight);
-
                 curExoVO = exoVO;
                 partExoList.add(curExoVO);
             }
@@ -133,12 +137,6 @@ public class ExoUtil {
                 // 2.5、处理每段属性，返回exo对象 todo
                 curExoVO = mapToExo(entry.getKey(),entry.getValue(),curExoVO);
             }
-            if("exedit".equals(curExoVO.getPartName())){
-                screenWidth = curExoVO.getWidth();
-                screenHeight = curExoVO.getHeight();
-            }
-
-
         }
 
         // 2.6、针对m7，exo对象各个字段影响修正（如换行、坐标瞄点）
@@ -191,14 +189,8 @@ public class ExoUtil {
 
         //将一个中间点、两段合并为一段，修改移动时间、总时间
         for(int k = 0;k < partExoList.size();k++){
-            if(1 == partExoList.get(k).getChain() && k > 0 && xmlEffect.isPointCut()){
-                //强制中间点分段
-                AviutlExo currentExo = partExoList.get(k);
-                AviutlExo lastExo = partExoList.get(k-1);
-                currentExo.setText(lastExo.getText());//补齐文本
-                currentExo.setFont(lastExo.getFont());//补齐字体
-                currentExo.setColor(lastExo.getColor());//补齐颜色
-            }else if(1 == partExoList.get(k).getChain() && k > 0 && checkAnmEffect(partExoList, k)) {
+            //链式
+            if(1 == partExoList.get(k).getChain() && k > 0) {
                 //先移动后停止（前面的x、y移动不同）
                 int s1 = partExoList.get(k-1).getStartX();
                 int s2 = partExoList.get(k-1).getEndX();
@@ -312,16 +304,16 @@ public class ExoUtil {
             if(partExoList.get(z).getEndZRotation() != null){
 
                 if(partExoList.get(z).getEasingZRotation() != null){
-                    List<CubicBezier> cubicList = CubicBezierUtil.parseCubicByTimes(Easing.getCode(partExoList.get(z).getEasingZRotation()),xmlEffect.getZrotationTimes() -1);
-                    for(int zz = 0 ; zz < xmlEffect.getZrotationTimes();zz++){
+                    List<CubicBezier> cubicList = CubicBezierUtil.parseCubicByTimes(Easing.getCode(partExoList.get(z).getEasingZRotation()),ZrotationTimes -1);
+                    for(int zz = 0 ; zz < ZrotationTimes;zz++){
                         AviutlExo rotatePartExo = new AviutlExo();
                         BeanUtils.copyProperties(partExoList.get(z), rotatePartExo);
                         double sTime = rotatePartExo.getStartTime();
                         double sRotation = rotatePartExo.getZRotation();
                         double lifeTime = rotatePartExo.getLifeTime();
-                        double pDuration = NumberUtil.div(lifeTime,xmlEffect.getZrotationTimes());
+                        double pDuration = NumberUtil.div(lifeTime,ZrotationTimes.doubleValue());
                         double diffRotation = rotatePartExo.getEndZRotation() - sRotation;
-                        double pRotation = NumberUtil.div(diffRotation, xmlEffect.getZrotationTimes() - 1);
+                        double pRotation = NumberUtil.div(diffRotation, ZrotationTimes - 1);
                         cubicList.get(zz).getProgression();//进度百分比
 
                         rotatePartExo.setLifeTime(pDuration + 0.05);
@@ -346,6 +338,8 @@ public class ExoUtil {
                         rotatePartExo.setEndX((int)position.getX());
                         rotatePartExo.setEndY((int)position.getY());
 
+                        //
+
                         splitList.add(rotatePartExo);
                     }
                 }
@@ -363,7 +357,7 @@ public class ExoUtil {
         // 换行墙砖文本
 
         List<AviutlExo> addList = new ArrayList<>();
-        if(xmlEffect.isForceLine()){
+        if(currentTXmlEffect.isForceLine()){
             Iterator<AviutlExo> itrLine = partExoList.iterator();
             while (itrLine.hasNext()){
                 AviutlExo tmp = itrLine.next();
@@ -406,17 +400,17 @@ public class ExoUtil {
         for(AviutlExo  avi : partExoList ){
             if("文本".equals(avi.getObjName()) ){
                 //是否有层级
-                if(xmlEffect.isLayer()){
+                if(currentTXmlEffect.isLayer()){
                     avi.setStartTime(d3(avi.getStartTime() + avi.getZ()*0.001));
                 }
                 //是否线性加速
-                if(xmlEffect.isLinearSpeedup()){
+                if(currentTXmlEffect.isLinearSpeedup()){
                     avi.setLinearSpeedup(1);
                 }else {
                     avi.setLinearSpeedup(0);
                 }
                 //是否直接加描边
-                if(xmlEffect.isOutline()){
+                if(currentTXmlEffect.isOutline()){
                     avi.setOutline(1);
                 }
             }
@@ -443,7 +437,7 @@ public class ExoUtil {
         StringBuffer bodyStr = new StringBuffer();
         for(int i = 0;i < exoList.size(); i++){
             AviutlExo exoBean = exoList.get(i);
-            XmlEffect currentXmlEffect = exoBean.getXmlEffect();
+
             if("文本".equals(exoBean.getObjName()) ){
                 // danmakuStr.append("<d p=\"5.6,7,30,ffffff,null,0,null,null\">[\"230\",\"380\",\"1-1\",\"5.4\",\"如 果 我 成 为 大 统 领\",0,0,\"230\",\"380\",\"0\",0,0,\"Microsoft YaHei\",1]</d>");
 
@@ -451,12 +445,12 @@ public class ExoUtil {
                 String startY = String.valueOf(exoBean.getStartY());
                 String endX = String.valueOf(exoBean.getEndX());
                 String endY = String.valueOf(exoBean.getEndY());
-                if(currentXmlEffect.isPercentage()){
+                if(currentTXmlEffect.isPercentage()){
                     //处理大于1和小于0情况
-                     startX = df3m7( (double)exoBean.getStartX()/exoBean.getWidth()) ;
-                     startY = df3m7( (double)exoBean.getStartY()/exoBean.getHeight()) ;
-                     endX =  df3m7( (double)exoBean.getEndX()/exoBean.getWidth()) ;
-                     endY = df3m7( (double)exoBean.getEndY()/exoBean.getHeight()) ;
+                     startX = df3m7( (double)exoBean.getStartX()/screenWidth ) ;
+                     startY = df3m7( (double)exoBean.getStartY()/screenHeight) ;
+                     endX =  df3m7( (double)exoBean.getEndX()/screenWidth) ;
+                     endY = df3m7( (double)exoBean.getEndY()/screenHeight) ;
                 }
 
                 StringBuffer danmakuStr = new StringBuffer();
@@ -464,17 +458,9 @@ public class ExoUtil {
                 danmakuStr.append(exoBean.getStartTime()).append(",");
                 danmakuStr.append("7").append(",");
                 danmakuStr.append(exoBean.getSize()).append(",");
-                if(currentXmlEffect.isColor10()){
+                if( 1 == colorHex10){
                     exoBean.setColor(ColorUtil.hexto10(exoBean.getColor()));
                 }
-
-                if(exoBean.getText()!= null && exoBean.getText().contains("<")){
-                    String text = exoBean.getText();
-                    text = text.replace("<","&lt;");
-                    exoBean.setText(text);
-                }
-
-
                 danmakuStr.append(exoBean.getColor()).append(",");
                 danmakuStr.append("null,0,null,null\">[");
                 danmakuStr.append("\"").append(startX).append("\"").append(",");
@@ -495,10 +481,10 @@ public class ExoUtil {
 
                 bodyStr.append(danmakuStr);
             }else if("图形".equals(exoBean.getObjName()) ){
-                if(currentXmlEffect.isColor10()){
+                if( 1 == colorHex10){
                     exoBean.setColor(ColorUtil.hexto10(exoBean.getColor()));
                 }
-                String bgGraph = "<d p=\""+ exoBean.getStartTime() +",7,127,"+exoBean.getColor()+",null,0,null,null\">[\"0\",\"0\",\"1-1\",\""+exoBean.getLifeTime()+"\",\"███████████\\n███████████\\n███████████\\n███████████\\n███████████\",0,0,\"0\",\"0\",\""+exoBean.getMoveTime()+"\",\"0\",0,\"\\\"Microsoft YaHei\\\"\",0]</d>\n"
+                String bgGraph = "<d p=\""+ exoBean.getStartTime() +",7,127,"+exoBean.getColor()+",null,0,null,null\">[\"0\",\"0\",\"1-1\",\""+exoBean.getLifeTime()+"\",\"█████████████\\n█████████████\\n█████████████\\n█████████████\\n█████████████\\n█████████████\",0,0,\"0\",\"0\",\""+exoBean.getMoveTime()+"\",\"0\",0,\"微软雅黑\",0]</d>\n"
 //                        +
 //                        "<d p=\""+ exoBean.getStartTime() +",7,127,"+exoBean.getColor()+",null,0,null,null\">[\"0.079\",\"0\",\"1-1\",\""+exoBean.getLifeTime()+"\",\"███████████\\n███████████\\n███████████\\n███████████\\n███████████\",0,0,\"0.079\",\"0\",\""+exoBean.getMoveTime()+"\",\"0\",0,\"SimHei\",0]</d>\n" +
 //                        "<d p=\""+ exoBean.getStartTime() +",7,127,"+exoBean.getColor()+",null,0,null,null\">[\"0\",\"0.118\",\"1-1\",\""+exoBean.getLifeTime()+"\",\"███████████\\n███████████\\n███████████\\n███████████\\n███████████\",0,0,\"0\",\"0.118\",\""+exoBean.getMoveTime()+"\",\"0\",0,\"SimHei\",0]</d>\n" +
@@ -537,7 +523,6 @@ public class ExoUtil {
      * @return
      */
     public static AviutlExo mapToExo(String key ,String value , AviutlExo exoBean){
-        XmlEffect xmlEffect = exoBean.getXmlEffect();
         if("动画效果".equals(exoBean.get_name())){
             List<AulAnmEffect> currentListAnm = new ArrayList<>();
             AulAnmEffect aviAumBean = new AulAnmEffect();
@@ -561,7 +546,7 @@ public class ExoUtil {
                             exoBean.setObjName(value);
                         }
                         exoBean.set_name(value);
-                        exoBean.setCurrentName(value);
+                        currentName = value;
                         break;
                     case "track0":
                         aviAumBean.setTrack0(value);
@@ -596,7 +581,7 @@ public class ExoUtil {
                             exoBean.setObjName(value);
                         }
                         exoBean.set_name(value);
-                        exoBean.setCurrentName(value);
+                        currentName = value;
                         break;
                     case "track0":
                         aviAumBean.setTrack0(value);
@@ -636,7 +621,7 @@ public class ExoUtil {
                         exoBean.setObjName(value);
                     }
                     exoBean.set_name(value);
-                    exoBean.setCurrentName(value);
+                    currentName = value;
                     break;
                 case "X":
                     aShadow.setShadowX(Double.valueOf(value).intValue());
@@ -667,7 +652,7 @@ public class ExoUtil {
                         exoBean.setObjName(value);
                     }
                     exoBean.set_name(value);
-                    exoBean.setCurrentName(value);
+                    currentName = value;
                     break;
                 case "大小":
                     aOutline.setOutlineSize(Integer.valueOf(value));
@@ -687,10 +672,12 @@ public class ExoUtil {
                     exoBean.setPartName(value);
                     break;
                 case "width":
-                    exoBean.setWidth(Integer.valueOf(value));
+                    screenWidth = Integer.valueOf(value);
+                    exoBean.setWidth(screenWidth);
                     break;
                 case "height":
-                    exoBean.setHeight(Integer.valueOf(value));
+                    screenHeight = Integer.valueOf(value);
+                    exoBean.setHeight(screenHeight);
                     break;
                 case "text":
                     String text = unicodeToString(exoTextToUnicode(value));
@@ -718,14 +705,14 @@ public class ExoUtil {
                     exoBean.setText(text);
                     break;
                 case "X":
-                    if("标准变换".equals(exoBean.getCurrentName())) {
+                    if("标准变换".equals(currentName)) {
                         if (value.contains(",")) {
                             String[] xArray = value.split(",");
                             Integer x1 = Double.valueOf(xArray[0]).intValue();
                             exoBean.setX(x1);
-                            exoBean.setStartX(x1 + exoBean.getWidth() / 2);
+                            exoBean.setStartX(x1 + screenWidth / 2);
                             Integer x2 = Double.valueOf(xArray[1]).intValue();
-                            exoBean.setEndX(x2 + exoBean.getWidth() / 2);
+                            exoBean.setEndX(x2 + screenWidth / 2);
 
                             if(xArray.length > 3){
                                 String access = xArray[3];
@@ -742,23 +729,23 @@ public class ExoUtil {
                             Integer x1 = Double.valueOf(value).intValue();
 
                             exoBean.setX(x1);
-                            exoBean.setStartX(x1 + exoBean.getWidth() / 2);
-                            exoBean.setEndX(x1 + exoBean.getWidth() / 2);
+                            exoBean.setStartX(x1 + screenWidth / 2);
+                            exoBean.setEndX(x1 + screenWidth / 2);
                         }
                     }
 
                     break;
                 case "Y":
-                    if("标准变换".equals(exoBean.getCurrentName())) {
+                    if("标准变换".equals(currentName)) {
                         if(value.contains(",")){
                             String[] yArray = value.split(",");
                             exoBean.setY(Double.valueOf(yArray[0]).intValue());
-                            exoBean.setStartY(Double.valueOf(yArray[0]).intValue() + exoBean.getHeight()/2);
-                            exoBean.setEndY(Double.valueOf(yArray[1]).intValue() + exoBean.getHeight()/2);
+                            exoBean.setStartY(Double.valueOf(yArray[0]).intValue() + screenHeight/2);
+                            exoBean.setEndY(Double.valueOf(yArray[1]).intValue() + screenHeight/2);
                         }else {
                             exoBean.setY(Double.valueOf(value).intValue());
-                            exoBean.setStartY(Double.valueOf(value).intValue() + exoBean.getHeight()/2);
-                            exoBean.setEndY(Double.valueOf(value).intValue() + exoBean.getHeight()/2);
+                            exoBean.setStartY(Double.valueOf(value).intValue() + screenHeight/2);
+                            exoBean.setEndY(Double.valueOf(value).intValue() + screenHeight/2);
                         }
                     }
 
@@ -780,25 +767,21 @@ public class ExoUtil {
                         exoBean.setObjName(value);
                     }
                     exoBean.set_name(value);
-                    exoBean.setCurrentName(value);
+                    currentName = value;
                     break;
                 case "start":
                     exoBean.setStart(Integer.valueOf(value));
                     double startTime = d2((Integer.valueOf(value)-1) / 30D);
-                    if(xmlEffect != null){
-                        if( xmlEffect.isAdvanceStartTime() ){
-                         startTime = startTime - 0.05;
-                        }
+                    if(currentTXmlEffect.isAdvanceStartTime()){
+                        startTime = startTime - 0.05;
                     }
                     exoBean.setStartTime(startTime);
                     break;
                 case "end":
                     exoBean.setEnd(Integer.valueOf(value));
                     double endTime = d2((Integer.valueOf(value)) / 30D);
-                    if(xmlEffect != null){
-                        if(xmlEffect.isDelayEndTime()){
-                            endTime = endTime + 0.05;
-                        }
+                    if(currentTXmlEffect.isDelayEndTime()){
+                        endTime = endTime + 0.05;
                     }
                     exoBean.setEndTime(endTime);
                     //计算生存时间
@@ -822,12 +805,12 @@ public class ExoUtil {
                     exoBean.setLayer(Integer.valueOf(value));
                     break;
                 case "color":
-                    if("文本".equals(exoBean.getCurrentName())||"图形".equals(exoBean.getCurrentName())) {
+                    if("文本".equals(currentName)||"图形".equals(currentName)) {
                         exoBean.setColor(value);
                     }
                     break;
                 case "大小":
-                    if("文本".equals(exoBean.getCurrentName())){
+                    if("文本".equals(currentName)){
                         exoBean.setSize(Double.valueOf(value).intValue());
                     }
                     break;
@@ -862,7 +845,7 @@ public class ExoUtil {
                     exoBean.setChain(Double.valueOf(value).intValue());
                     break;
                 case "浓度":
-                    if("阴影".equals(exoBean.getCurrentName())){
+                    if("阴影".equals(currentName)){
                         AulShadow ashadow = new AulShadow();
                         ashadow.setShadowAlpha(doubleTrans(1-Double.valueOf(value)*0.01 ) + "-" + doubleTrans(1-Double.valueOf(value)*0.01));
                         exoBean.setAulShadow(ashadow);
@@ -905,14 +888,6 @@ public class ExoUtil {
                         String  param =  anmOpt.get().getParam();
                         name = anmOpt.get().getName();
 
-                        if("分段移动".equals(name) && name.equals(anmName)){
-                            System.out.println("分段移动");
-                            //如果找到个路径相随的，就 todo
-
-
-                        }
-
-
                         if("增加前段时间".equals(name) && name.equals(anmName)){
                             double preTime = Double.valueOf(track0);
                             aviExo.setStartTime(d3(aviExo.getStartTime()+ preTime*0.001 ));
@@ -926,9 +901,6 @@ public class ExoUtil {
                             aviExo.setLifeTime(d3(aviExo.getLifeTime()+ afterTime*0.001 ));
                             aviExo.setMoveTime(aviExo.getMoveTime()+ Double.valueOf(afterTime).intValue()  );
                         }
-
-
-
 
                         if("换行转弹幕".equals(name) && name.equals(anmName)){
                             String  text = aviExo.getText();
@@ -1108,7 +1080,6 @@ public class ExoUtil {
         List<String> anmList = new ArrayList<>();
         anmList.add("增加前段时间");
         anmList.add("增加后段时间");
-        anmList.add("分段移动");
 
         //一转多
         anmList.add("换行转弹幕");
@@ -1167,45 +1138,6 @@ public class ExoUtil {
 
         return positionList;
     }
-
-
-    public static boolean checkAnmEffect(List<AviutlExo> partExoList, int k) {
-            AviutlExo aviExo = partExoList.get(k);
-            AviutlExo lastAviExo = partExoList.get(k-1);
-            boolean flag = true;
-            List<AulAnmEffect> aulAnmEffectList = aviExo.getAulAnmEffectList();
-            if(aulAnmEffectList != null) {
-                for(int j = 0; j < aulAnmEffectList.size(); j++){
-                    AulAnmEffect aulAnmEffect = new AulAnmEffect();
-                    aulAnmEffect = aulAnmEffectList.get(j);
-                    Optional<AulAnmEffect> anmOpt = Optional.ofNullable(aulAnmEffect);
-                    String name = "";
-                    if (anmOpt.isPresent()) {
-                        String track0 = anmOpt.get().getTrack0();
-                        String track1 = anmOpt.get().getTrack1();
-                        String track2 = anmOpt.get().getTrack2();
-                        String track3 = anmOpt.get().getTrack3();
-                        String param = anmOpt.get().getParam();
-                        name = lastAviExo.getAulAnmEffectList().get(j).getName();//链式没有效果名，取链头的效果名称
-
-                        if("分段移动".equals(name)){
-                            System.out.println("分段移动");
-                            flag = false;
-                            aulAnmEffect.setName(name);
-                            // 单纯分段
-                            aviExo.setText(lastAviExo.getText());//补齐文本
-                            aviExo.setFont(lastAviExo.getFont());//补齐字体
-                            aviExo.setColor(lastAviExo.getColor());//补齐颜色
-
-
-                        }
-
-                    }
-                }
-            }
-        return flag;
-    }
-
 
 
 }

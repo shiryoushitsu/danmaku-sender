@@ -8,7 +8,7 @@ public class LengthUtil {
     private static final String ENCODE_UTF = "UTF-8";
 
     public static void main(String[] args) {
-        String str = "测试";
+        String str = "█";
         System.out.println(getLength(str));
         System.out.println(getStrLength(str));
     }
