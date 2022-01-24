@@ -571,19 +571,14 @@ export default {
           this.axios.post('/danmaku/sendDanmakuM7', param, config).then(res => {
             // let res = JSON.stringify(response);
             if(res.data.code == 200){
-              //1、预览是通过接口返回日志数据
-              // if(type == 'preview'){
+              //预览是通过接口返回日志数据
                 this.textarea = res.data.data.txtLog
                 console.log(this.textarea);
-              // }
-              //4、关闭轮询
+              //关闭轮询
               _this.stopSetInterval()
               this.timerStatus = 0;
-
             }
           }).catch(error =>  {
-            _this.stopSetInterval()
-            
             console.log(error);
           });
 
@@ -638,10 +633,12 @@ export default {
       this.axios.post('/danmaku/getFileLog', paramLog, config).then(res => {
         if(res.data.code == 200){
           this.textarea = res.data.data.txtLog
-          // console.log(this.textarea);
+          if(res.data.data.txtLog.indexOf("─全部弹幕发送完毕─")>0){
+              console.log("关闭轮询")
+              this.stopSetInterval()
+          }
         }
       }).catch(error =>  {
-        this.stopSetInterval()
         console.log(error);
       });
     },

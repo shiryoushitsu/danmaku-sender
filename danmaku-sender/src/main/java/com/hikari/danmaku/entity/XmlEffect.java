@@ -2,38 +2,39 @@ package com.hikari.danmaku.entity;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.Getter;
 
 @Data
 public class XmlEffect {
 
     @ApiModelProperty("是否描边")
-    private boolean isOutline = false;
+    private Boolean isOutline = false;
 
     @ApiModelProperty("是否实现层级效果（用z轴来增加时间，用时间覆盖来实现层级效果）")
-    private boolean isLayer = true;
+    private Boolean isLayer = true;
 
     @ApiModelProperty("是否换行都转成新文本（距离默认字号）")
-    private boolean isForceLine = false;
+    private Boolean isForceLine = false;
 
     @ApiModelProperty("是否线性加速")
-    private boolean isLinearSpeedup = false;
+    private Boolean isLinearSpeedup = false;
 
     @ApiModelProperty("是否坐标百分比")
-    private boolean isPercentage = true;
+    private Boolean isPercentage = true;
 
     @ApiModelProperty("是否提前开始时间（提前50ms，解决连续两段弹幕之间闪烁问题）")
-    private boolean isAdvanceStartTime = false;
+    private Boolean isAdvanceStartTime = false;
 
     @ApiModelProperty("是否延长结束时间（延长50ms，解决连续两段弹幕之间闪烁问题）")
-    private boolean isDelayEndTime = false;
+    private Boolean isDelayEndTime = false;
 
     @ApiModelProperty("是否十进制颜色")
-    private boolean isColor10 = true;
+    private Boolean isColor10 = false;
 
     @ApiModelProperty("是否中间点强制分句")
-    private boolean isPointCut = false;
+    private Boolean isPointCut = false;
 
     @ApiModelProperty("")
-    private int ZrotationTimes = 10;
+    private Integer ZrotationTimes = 10;
 
 }

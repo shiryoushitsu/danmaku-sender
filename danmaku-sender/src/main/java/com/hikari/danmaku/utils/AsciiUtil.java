@@ -18,9 +18,10 @@ import static com.hikari.danmaku.utils.ColorUtil.convertRGBToHex;
 
 public class AsciiUtil {
     public static void main(String []args) {
-        checkEnvironmentFont();
+//        checkEnvironmentFont();
         //正文字
-//        List<List<String>> arrayList = txtToList("D:\\弹.txt");
+        List<List<String>> arrayList = txtToList("D:\\好.txt");
+        printTxtList(restoreTxtList(arrayList));
 //        List<List<String>> arrayList = txtToList("D:\\正LOVE.txt");
 
 //        List<List<String>> arrayList = txtToList("D:\\正bilibili干杯.txt");
@@ -53,7 +54,9 @@ public class AsciiUtil {
 //      getBlackWhite(path);
     }
 
-    //检查系统可用字体
+    /**
+     * 检查系统可用字体
+     */
     public static void checkEnvironmentFont(){
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         String[] fontFamilies = ge.getAvailableFontFamilyNames();
@@ -62,7 +65,9 @@ public class AsciiUtil {
         }
     }
 
-    //检查系统可用字体
+    /**
+     * 获取字的字符字
+     */
     public static String getFontAscii(String text, FontFamily fontFamily){
         String content = text;
         BufferedImage image = new BufferedImage(content.length() * fontFamily.getFontWidth(), fontFamily.getFontHeight(), BufferedImage.TYPE_INT_RGB);
@@ -112,7 +117,6 @@ public class AsciiUtil {
 //                System.out.print("("+rgb[0] + "," + rgb[1] + "," + rgb[2] + ")");
                 point=bi.getRGB(x, y)&0x0000ff;
 //                getLogger().info(point+"");
-
 //                for (int j = 0; j < image.getWidth(); j++) {
                     String oneChar ="";
                 if("ffffff".equals(convertRGBToHex(rgb[0],rgb[1],rgb[2]))||"FFFFFF".equals(convertRGBToHex(rgb[0],rgb[1],rgb[2]))){
@@ -131,9 +135,6 @@ public class AsciiUtil {
 
 //                System.out.print(p[i*image.getWidth() + j] == -1 ? "█" : "　" + (j == image.getWidth()-1 ? "\n" : ""));
 //                }
-
-
-
 //                System.out.print("16进制颜色："+convertRGBToHex(rgb[0],rgb[1],rgb[2]) );
 //                convertRGBToHex(rgb[0],rgb[1],rgb[2]);
 
@@ -142,6 +143,46 @@ public class AsciiUtil {
             System.out.println(charStr);
         }
 
+    }
+
+    /**
+     * 根据字符的二维数组，去除上下左多余空格/补全右边空格
+     */
+    public static  List<List<String>> restoreTxtList(List<List<String>> txtList)  {
+        List<List<String>> arrayList = txtList;
+        // 最外层是行
+
+        List<List<String>> stringList = new ArrayList<>();
+        // 1.去除最上行空格直到有黑色文字 todo
+        for(List<String> lineList :arrayList){
+            for(String charText : lineList){
+                // 判断 如果有其他字符 ，则
+                if(!charText.equals(" ") && !charText.equals("　")  &&  !charText.equals("　")){
+                    stringList.add(lineList);
+                    break;
+                }
+            }
+        }
+        // 2.去除最下行
+
+
+
+        return stringList;
+    }
+
+    /**
+     * 控制台打印txt二维数组
+     */
+    public static void printTxtList(List<List<String>> txtList) {
+        for(List<String>  lineStr : txtList){
+            String line = "";
+            for(String str : lineStr){
+                line = line + str;
+            }
+            System.out.println(line);
+        }
+
+//        return arrayList;
     }
 
 
@@ -199,7 +240,6 @@ public class AsciiUtil {
         }
         return arrayList;
     }
-
 
     /**
      * 二维行列替换

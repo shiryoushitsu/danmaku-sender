@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 
 public class Lrc2ExoUtil {
     public static void main(String []args) {
-        String fileName = "テレキャスタービーボーイ";
+        String fileName = "dance-jp";
         String inputLrcPath = "C:\\Users\\hikari\\Desktop\\" + fileName + ".lrc";
         String outputExoPath = "C:\\Users\\hikari\\Desktop\\"+ fileName +".exo";
         List<Ass> assList = lrcToAssListV2(inputLrcPath);

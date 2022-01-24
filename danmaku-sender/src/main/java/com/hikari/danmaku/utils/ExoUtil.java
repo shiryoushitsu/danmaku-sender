@@ -10,28 +10,30 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import static com.hikari.danmaku.utils.CAUtil.parseCAJson;
 import static com.hikari.danmaku.utils.CommonUtil.*;
 
 public class ExoUtil {
 
     // 15寸 760 510  38.8% / 14寸 850 560 43.4% /1px约等于0.002百分比
     public static void main(String[] args) {
-        String fileName = "路径跟随";
+        String fileName = "0123改版";
 //        String fileName = "hello闪字";
         String inputExoPath = "C:\\Users\\hikari\\Desktop\\"+  fileName+ ".exo";
         String outputXmlPath = "C:\\Users\\hikari\\Desktop\\"+ fileName +".xml";
 
         XmlEffect XmlEffect = new XmlEffect();
-        XmlEffect.setOutline(false);
-        XmlEffect.setLayer(true);
-        XmlEffect.setLinearSpeedup(false);
-        XmlEffect.setAdvanceStartTime(false);
-        XmlEffect.setDelayEndTime(true);
-        XmlEffect.setForceLine(false);//是否换行都转成新文本
-        XmlEffect.setPercentage(true);//是否百分比
-        XmlEffect.setColor10(false);
+        XmlEffect.setIsOutline(false);
+        XmlEffect.setIsLayer(true);
+        XmlEffect.setIsLinearSpeedup(false);
+        XmlEffect.setIsAdvanceStartTime(false);
+        XmlEffect.setIsDelayEndTime(true);
+        XmlEffect.setIsForceLine(false);//是否换行都转成新文本
+        XmlEffect.setIsPercentage(true);//是否百分比
+//        XmlEffect.setIsColor10(false);
 
-        XmlEffect.setPointCut(true);
+//        XmlEffect.setIsPointCut(true);
 //        XmlEffect.setForceLine(true);//是否换行都转成新文本（m7滚动配置）
 //        XmlEffect.setPercentage(false);//使用px（m7滚动配置）
 //             XmlEffect;
@@ -191,7 +193,7 @@ public class ExoUtil {
 
         //将一个中间点、两段合并为一段，修改移动时间、总时间
         for(int k = 0;k < partExoList.size();k++){
-            if(1 == partExoList.get(k).getChain() && k > 0 && xmlEffect.isPointCut()){
+            if(1 == partExoList.get(k).getChain() && k > 0 && xmlEffect.getIsPointCut()){
                 //强制中间点分段
                 AviutlExo currentExo = partExoList.get(k);
                 AviutlExo lastExo = partExoList.get(k-1);
@@ -319,7 +321,7 @@ public class ExoUtil {
                         double sTime = rotatePartExo.getStartTime();
                         double sRotation = rotatePartExo.getZRotation();
                         double lifeTime = rotatePartExo.getLifeTime();
-                        double pDuration = NumberUtil.div(lifeTime,xmlEffect.getZrotationTimes());
+                        double pDuration = NumberUtil.div(lifeTime, (double)xmlEffect.getZrotationTimes());
                         double diffRotation = rotatePartExo.getEndZRotation() - sRotation;
                         double pRotation = NumberUtil.div(diffRotation, xmlEffect.getZrotationTimes() - 1);
                         cubicList.get(zz).getProgression();//进度百分比
@@ -363,7 +365,7 @@ public class ExoUtil {
         // 换行墙砖文本
 
         List<AviutlExo> addList = new ArrayList<>();
-        if(xmlEffect.isForceLine()){
+        if(xmlEffect.getIsForceLine()){
             Iterator<AviutlExo> itrLine = partExoList.iterator();
             while (itrLine.hasNext()){
                 AviutlExo tmp = itrLine.next();
@@ -401,22 +403,49 @@ public class ExoUtil {
         }
 
 
+//        String jsonFileName = "CA_berrygo";
+//        String inputJsonPath = "C:\\Users\\hikari\\Desktop\\" + jsonFileName + ".json";
+//        List<Map<String,String>> jsonList = CAUtil.parseCAJson(inputJsonPath);
+//        List<AviutlExo> caAddList = new ArrayList<>();
+//        //CA替换
+//        Iterator<AviutlExo> itrLine = partExoList.iterator();
+//        while (itrLine.hasNext()){
+//            AviutlExo tmp = itrLine.next();
+//            if("ca".equals(tmp.getText())){
+//                for(Map<String,String> mapObject : jsonList){
+//                    String color =  mapObject.get("color");
+//                    String comment =  mapObject.get("comment");
+//                    comment = comment.replace("\n","\\n");
+//                    AviutlExo axo = new AviutlExo();
+//                    BeanUtils.copyProperties(tmp, axo);
+//                    axo.setColor(color);
+//                    axo.setText(comment);
+//                    caAddList.add(axo);
+//                }
+//                tmp.setState(0);
+//            }
+//            if (tmp.getState() == 0){
+//                itrLine.remove();
+//            }
+//        }
+//        partExoList.addAll(caAddList);
+
 
         //M7额外全局逻辑处理
         for(AviutlExo  avi : partExoList ){
             if("文本".equals(avi.getObjName()) ){
                 //是否有层级
-                if(xmlEffect.isLayer()){
+                if(xmlEffect.getIsLayer()){
                     avi.setStartTime(d3(avi.getStartTime() + avi.getZ()*0.001));
                 }
                 //是否线性加速
-                if(xmlEffect.isLinearSpeedup()){
+                if(xmlEffect.getIsLinearSpeedup()){
                     avi.setLinearSpeedup(1);
                 }else {
                     avi.setLinearSpeedup(0);
                 }
                 //是否直接加描边
-                if(xmlEffect.isOutline()){
+                if(xmlEffect.getIsOutline()){
                     avi.setOutline(1);
                 }
             }
@@ -437,65 +466,86 @@ public class ExoUtil {
     public static String exoToXml(List<AviutlExo> exoList){
         System.out.println("******************************************");
         StringBuffer xml = new StringBuffer();
-
         StringBuffer headStr = new StringBuffer();
         headStr.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?><i>\n");
         StringBuffer bodyStr = new StringBuffer();
+        List<String> overLength = new ArrayList<>();
         for(int i = 0;i < exoList.size(); i++){
             AviutlExo exoBean = exoList.get(i);
             XmlEffect currentXmlEffect = exoBean.getXmlEffect();
             if("文本".equals(exoBean.getObjName()) ){
-                // danmakuStr.append("<d p=\"5.6,7,30,ffffff,null,0,null,null\">[\"230\",\"380\",\"1-1\",\"5.4\",\"如 果 我 成 为 大 统 领\",0,0,\"230\",\"380\",\"0\",0,0,\"Microsoft YaHei\",1]</d>");
-
                 String startX = String.valueOf(exoBean.getStartX());
                 String startY = String.valueOf(exoBean.getStartY());
                 String endX = String.valueOf(exoBean.getEndX());
                 String endY = String.valueOf(exoBean.getEndY());
-                if(currentXmlEffect.isPercentage()){
-                    //处理大于1和小于0情况
-                     startX = df3m7( (double)exoBean.getStartX()/exoBean.getWidth()) ;
-                     startY = df3m7( (double)exoBean.getStartY()/exoBean.getHeight()) ;
-                     endX =  df3m7( (double)exoBean.getEndX()/exoBean.getWidth()) ;
-                     endY = df3m7( (double)exoBean.getEndY()/exoBean.getHeight()) ;
+                if(currentXmlEffect.getIsPercentage()){
+                    if(exoBean.getWidth() == null || exoBean.getHeight() == null || exoBean.getStartX() == null || exoBean.getStartY() == null || exoBean.getEndX() == null || exoBean.getEndY() == null){
+                        System.out.println(exoBean);
+                    }else {
+                        //处理大于1和小于0情况
+                        startX = df3m7( (double)exoBean.getStartX()/exoBean.getWidth()) ;
+                        startY = df3m7( (double)exoBean.getStartY()/exoBean.getHeight()) ;
+                        endX =  df3m7( (double)exoBean.getEndX()/exoBean.getWidth()) ;
+                        endY = df3m7( (double)exoBean.getEndY()/exoBean.getHeight()) ;
+                    }
                 }
 
                 StringBuffer danmakuStr = new StringBuffer();
+                StringBuffer danmakuContentStr = new StringBuffer();
                 danmakuStr.append("<d p=\"");
                 danmakuStr.append(exoBean.getStartTime()).append(",");
                 danmakuStr.append("7").append(",");
                 danmakuStr.append(exoBean.getSize()).append(",");
-                if(currentXmlEffect.isColor10()){
+                if(currentXmlEffect.getIsColor10()){
                     exoBean.setColor(ColorUtil.hexto10(exoBean.getColor()));
                 }
 
-                if(exoBean.getText()!= null && exoBean.getText().contains("<")){
+                if(exoBean.getText()!= null && (exoBean.getText().contains("<") ||exoBean.getText().contains(">"))){
                     String text = exoBean.getText();
                     text = text.replace("<","&lt;");
+                    text = text.replace(">","&gt;");
                     exoBean.setText(text);
                 }
 
-
                 danmakuStr.append(exoBean.getColor()).append(",");
-                danmakuStr.append("null,0,null,null\">[");
-                danmakuStr.append("\"").append(startX).append("\"").append(",");
-                danmakuStr.append("\"").append(startY).append("\"").append(",");
-                danmakuStr.append("\"").append(exoBean.getAlpha()).append("\"").append(",");
-                danmakuStr.append("\"").append(exoBean.getLifeTime()).append("\"").append(",");
-                danmakuStr.append("\"").append(exoBean.getText()).append("\"").append(",");
-                danmakuStr.append(exoBean.getZRotation()).append(",");//Z_Rotation
-                danmakuStr.append(0).append(",");//Y_Rotation
-                danmakuStr.append("\"").append(endX).append("\"").append(",");
-                danmakuStr.append("\"").append(endY).append("\"").append(",");
-                danmakuStr.append("\"").append(exoBean.getMoveTime()).append("\"").append(",");
-                danmakuStr.append("\"").append(exoBean.getDelayTime()).append("\"").append(",");//Delay_Time
-                danmakuStr.append(exoBean.getOutline()).append(",");//Outline
-                danmakuStr.append("\"").append(exoBean.getFont()).append("\"").append(",");
-                danmakuStr.append(exoBean.getLinearSpeedup());//Linear_Speedup
-                danmakuStr.append("]</d>\n");
+                danmakuStr.append("null,0,null,null\">");
+                danmakuContentStr.append("[");
+                danmakuContentStr.append("\"").append(startX).append("\"").append(",");
+                danmakuContentStr.append("\"").append(startY).append("\"").append(",");
+//                danmakuStr.append(startX).append(",");
+//                danmakuStr.append(startY).append(",");
+                danmakuContentStr.append("\"").append(exoBean.getAlpha()).append("\"").append(",");
+                danmakuContentStr.append("\"").append(exoBean.getLifeTime()).append("\"").append(",");
+                danmakuContentStr.append("\"").append(exoBean.getText()).append("\"").append(",");
+                danmakuContentStr.append(exoBean.getZRotation()).append(",");//Z_Rotation
+                danmakuContentStr.append(0).append(",");//Y_Rotation
+                danmakuContentStr.append("\"").append(endX).append("\"").append(",");
+                danmakuContentStr.append("\"").append(endY).append("\"").append(",");
+//                danmakuStr.append(endX).append(",");
+//                danmakuStr.append(endY).append(",");
+                danmakuContentStr.append(exoBean.getMoveTime()).append(",");
+                danmakuContentStr.append(exoBean.getDelayTime()).append(",");//Delay_Time
+                danmakuContentStr.append(exoBean.getOutline()).append(",");//Outline
+                danmakuContentStr.append("\"").append(exoBean.getFont()).append("\"").append(",");
+                danmakuContentStr.append(exoBean.getLinearSpeedup());//Linear_Speedup
+                danmakuContentStr.append("]");
 
+                danmakuStr = danmakuStr.append(danmakuContentStr);
+                danmakuStr.append("</d>\n");
                 bodyStr.append(danmakuStr);
+
+                int charLength = LengthUtil.getCharLength(danmakuContentStr.toString());
+                if(charLength > 300){
+                    String overMsg = "第" + (i + 1) + "条弹幕长度超过300，总长" + charLength +"\n" + danmakuContentStr.toString();
+                    overMsg = overMsg.substring(0, overMsg.length() - 1);
+                    overLength.add(overMsg);
+                }
+                if(exoBean.getSize() < 10 || exoBean.getSize() > 127 ){
+                    overLength.add("第" + (i + 1)  + "条弹幕字体大小为" + exoBean.getSize() + "超过限制");
+                }
+
             }else if("图形".equals(exoBean.getObjName()) ){
-                if(currentXmlEffect.isColor10()){
+                if(currentXmlEffect.getIsColor10()){
                     exoBean.setColor(ColorUtil.hexto10(exoBean.getColor()));
                 }
                 String bgGraph = "<d p=\""+ exoBean.getStartTime() +",7,127,"+exoBean.getColor()+",null,0,null,null\">[\"0\",\"0\",\"1-1\",\""+exoBean.getLifeTime()+"\",\"███████████\\n███████████\\n███████████\\n███████████\\n███████████\",0,0,\"0\",\"0\",\""+exoBean.getMoveTime()+"\",\"0\",0,\"\\\"Microsoft YaHei\\\"\",0]</d>\n"
@@ -518,12 +568,17 @@ public class ExoUtil {
         System.out.println("******************************************");
         System.out.println("总共：" + exoList.size() + "条弹幕");
         System.out.println("******************************************");
+        if(overLength.size() > 0){
+            for(String overMsg: overLength){
+                System.out.println(overMsg);
+            }
+            System.out.println("******************************************");
+        }
+
         System.out.println("let s=`"+ xml.toString().replace("\n","") +"`");
         System.out.println("ldanmu=xml2danmu(s)");
         System.out.println("window.ldldanmu[window.ldldanmu.length-1].ldanmu=ldanmu");
         System.out.println("******************************************");
-
-
 
         return  xml.toString();
     }
@@ -786,7 +841,7 @@ public class ExoUtil {
                     exoBean.setStart(Integer.valueOf(value));
                     double startTime = d2((Integer.valueOf(value)-1) / 30D);
                     if(xmlEffect != null){
-                        if( xmlEffect.isAdvanceStartTime() ){
+                        if( xmlEffect.getIsAdvanceStartTime() ){
                          startTime = startTime - 0.05;
                         }
                     }
@@ -796,7 +851,7 @@ public class ExoUtil {
                     exoBean.setEnd(Integer.valueOf(value));
                     double endTime = d2((Integer.valueOf(value)) / 30D);
                     if(xmlEffect != null){
-                        if(xmlEffect.isDelayEndTime()){
+                        if(xmlEffect.getIsDelayEndTime()){
                             endTime = endTime + 0.05;
                         }
                     }
@@ -1196,8 +1251,6 @@ public class ExoUtil {
                             aviExo.setText(lastAviExo.getText());//补齐文本
                             aviExo.setFont(lastAviExo.getFont());//补齐字体
                             aviExo.setColor(lastAviExo.getColor());//补齐颜色
-
-
                         }
 
                     }

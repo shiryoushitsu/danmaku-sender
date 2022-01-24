@@ -173,7 +173,6 @@ public class DanmakuController {
         int comSum = danmakuSum - 1;
         if(comSum == 0){comSum = 1;}
         long diffTime = (endRecord - startRecord) / 1000 / comSum;
-        System.out.println(endRecord - startRecord);
         logService.writePlus(writer,finishDivider);
         logService.writePlus(writer,"发送{}条，总耗时{}，发送间隔{}秒，随机{}秒，重发间隔{}分\n平均每发送一条弹幕花费{}秒",
                 danmakuSum,
@@ -358,7 +357,6 @@ public class DanmakuController {
         int comSum = danmakuSum - 1;
         if(comSum == 0){comSum = 1;}
         long diffTime = (endRecord - startRecord) / 1000 / comSum;
-        System.out.println(endRecord - startRecord);
         logService.writePlus(writer,finishDivider);
         logService.writePlus(writer,"发送{}条，总耗时{}。发送间隔{}秒，随机{}秒，重发间隔{}分\n平均每发送一条弹幕花费{}秒",
                 danmakuSum,
@@ -687,7 +685,6 @@ public class DanmakuController {
         int comSum = danmakuSum - 1;
         if(comSum == 0){comSum = 1;}
         long diffTime = (endRecord - startRecord) / 1000 / comSum;
-        System.out.println(endRecord - startRecord);
         logService.writePlus(writer,finishDivider);
         logService.writePlus(writer,"发送{}条，总耗时{}，发送间隔{}秒，随机{}秒，重发间隔{}分\n平均每发送一条弹幕花费{}秒",
                 danmakuSum,

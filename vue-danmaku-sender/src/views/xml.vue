@@ -293,18 +293,14 @@ export default {
           }
           this.axios.post('/danmaku/sendDanmakuXml', param, config).then(res => {
             if(res.data.code == 200){
-                this.textarea = res.data.data.txtLog
-                console.log(this.textarea);
+              this.textarea = res.data.data.txtLog
+              console.log(this.textarea);
               _this.stopSetInterval()
               this.timerStatus = 0;
-
             }
           }).catch(function (error) {
-            _this.stopSetInterval()
-            debugger
             console.log(error);
           });
-
           console.log("轮询弹幕日志接口")
           this.createSetInterval()
         }
@@ -356,10 +352,12 @@ export default {
       this.axios.post('/danmaku/getFileLog', paramLog, config).then(res => {
         if(res.data.code == 200){
           this.textarea = res.data.data.txtLog
-          // console.log(this.textarea);
+          if(res.data.data.txtLog.indexOf("─全部弹幕发送完毕─")>0){
+              console.log("关闭轮询")
+              this.stopSetInterval()
+          }
         }
       }).catch(error =>  {
-        this.stopSetInterval()
         console.log(error);
       });
     },
@@ -378,7 +376,6 @@ export default {
               this.textarea = res.data.data.txtLog
             }
           }).catch(error =>  {
-            this.stopSetInterval()
             console.log(error);
           });
       }
@@ -397,7 +394,7 @@ export default {
     // 关闭轮询
     stopSetInterval() {
       if (this.timer) {
-        console.log("关闭查询日志轮训")
+        console.log("关闭查询日志轮询")
         clearInterval(this.timer)
         this.timer = null
       }

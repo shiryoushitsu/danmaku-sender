@@ -30,7 +30,7 @@
           </el-col>
         </el-row>
 
-        <el-row>
+        <!-- <el-row>
           <el-col :span="12">
               <el-form-item size="middle" label="视频宽度" prop="cookie" label-width="100px">
                     <el-input v-model="form.screenWidth"   placeholder="视频宽度"  />
@@ -41,7 +41,7 @@
                     <el-input v-model="form.screenHeight"  placeholder="请输入视频BV号"  />
                   </el-form-item>
           </el-col>
-        </el-row>
+        </el-row> -->
 
 
 
@@ -193,6 +193,7 @@ export default {
 
           this.createCode();
           param.append('requestId', this.requestId) // 每次请求创建一个随机Id
+          debugger
           let config = {
               headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8' }
           }
