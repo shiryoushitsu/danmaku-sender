@@ -10,6 +10,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -18,10 +19,10 @@ import static com.hikari.danmaku.utils.ColorUtil.convertRGBToHex;
 
 public class AsciiUtil {
     public static void main(String []args) {
-//        checkEnvironmentFont();
+        checkEnvironmentFont();
         //正文字
-        List<List<String>> arrayList = txtToList("D:\\好.txt");
-        printTxtList(restoreTxtList(arrayList));
+//        List<List<String>> arrayList = txtToList("D:\\补全空格.txt");
+//        printTxtList(restoreTxtList(completedBlankSpace(arrayList)));
 //        List<List<String>> arrayList = txtToList("D:\\正LOVE.txt");
 
 //        List<List<String>> arrayList = txtToList("D:\\正bilibili干杯.txt");
@@ -145,30 +146,125 @@ public class AsciiUtil {
 
     }
 
-    /**
-     * 根据字符的二维数组，去除上下左多余空格/补全右边空格
-     */
-    public static  List<List<String>> restoreTxtList(List<List<String>> txtList)  {
-        List<List<String>> arrayList = txtList;
-        // 最外层是行
 
-        List<List<String>> stringList = new ArrayList<>();
-        // 1.去除最上行空格直到有黑色文字 todo
-        for(List<String> lineList :arrayList){
-            for(String charText : lineList){
-                // 判断 如果有其他字符 ，则
-                if(!charText.equals(" ") && !charText.equals("　")  &&  !charText.equals("　")){
-                    stringList.add(lineList);
-                    break;
+    /**
+     * 去除四周空格
+     */
+    public static List<List<String>> removeAroundSpace(List<List<String>> txtList){
+        // 去除上下空格
+        txtList = restoreTxtList(txtList);
+        // 补全右边空格
+        txtList = completedBlankSpace(txtList);
+        // 二维行列替换
+        txtList = exchangeList(txtList);
+        // 去除上下空格
+        txtList = restoreTxtList(txtList);
+        // 二维行列替换
+        txtList = exchangeList(txtList);
+        return txtList;
+    };
+
+
+    /**
+     * 补全右边空格（字符字用）
+     */
+    public static List<List<String>> completedBlankSpace(List<List<String>> txtList) {
+        List<List<String>> arrayList = txtList;
+
+        // 查询最长
+        int maxLength = 0;
+        for (List<String> linesList : arrayList){
+            int currentLength = linesList.size();
+            if(maxLength < currentLength){
+                maxLength = currentLength;
+            }
+        }
+
+        //补齐全角空格
+        for (List<String> linesList : arrayList){
+            int currentLength =  linesList.size();
+            if(maxLength > currentLength){
+                for(int i = 0 ;i<maxLength - currentLength; i++){
+                    linesList.add("　");
                 }
             }
         }
-        // 2.去除最下行
 
-
-
-        return stringList;
+        return arrayList;
     }
+
+    /**
+     * 去除右边空格（pc端和手机端空格差异底部和顶部弹幕才有，m7没此问题） todo
+     */
+    public static List<List<String>> removeBlankSpace(List<List<String>> txtList) {
+        List<List<String>> arrayList = txtList;
+
+//        // 查询最长
+//        int maxLength = 0;
+//        for (List<String> linesList : arrayList){
+//            int currentLength = linesList.size();
+//            if(maxLength < currentLength){
+//                maxLength = currentLength;
+//            }
+//        }
+//
+//        //补齐全角空格
+//        for (List<String> linesList : arrayList){
+//            int currentLength = linesList.size();
+//            if(maxLength > currentLength){
+//                for(int i = 0 ;i<maxLength - currentLength; i++){
+//                    linesList.add("　");
+//                }
+//            }
+//        }
+
+        return arrayList;
+    }
+
+
+    /**
+     * 去除上下空格（字符字用）
+     */
+    public static List<List<String>> restoreTxtList(List<List<String>> txtList)  {
+        List<List<String>> arrayList = txtList;
+        // 1. 从上直到非空格行，直接删除行
+        List<List<String>> restoreList = new ArrayList<>();
+        boolean topFlag = false;
+        for (List<String> linesList : arrayList){
+            if(topFlag){
+                restoreList.add(linesList);
+            }else {
+                for (String charStr : linesList){
+                    if(!" ".equals(charStr) && !"　".equals(charStr) && !"　".equals(charStr)){
+                        topFlag = true;
+                        restoreList.add(linesList);
+                        break;
+                    }
+                }
+            }
+        }
+
+        // 2. 从下直到非空格行，直接删除行
+        List<List<String>> restoreBottomList = new ArrayList<>();
+        boolean bottomFlag = false;
+        for (int i = 0;i< restoreList.size();i++){
+            if(bottomFlag){
+                restoreBottomList.add(restoreList.get(restoreList.size()  - i - 1));
+            }else {
+                List<String> linesList = restoreList.get(restoreList.size()  - i - 1);
+                for (String charStr : linesList){
+                    if(!" ".equals(charStr) && !"　".equals(charStr)){
+                        bottomFlag = true;
+                        restoreList.add(linesList);
+                        break;
+                    }
+                }
+            }
+        }
+        Collections.reverse(restoreBottomList);
+        return restoreBottomList;
+    }
+
 
     /**
      * 控制台打印txt二维数组
@@ -202,6 +298,40 @@ public class AsciiUtil {
         }
         return arrayList;
     }
+
+    /**
+     * 换行String返回二维数组
+     */
+    public static List<List<String>> lnToList(String lnStr)  {
+        List<List<String>> arrayList = new ArrayList<>();
+        String[] split = lnStr.split("\\n");
+        List<String> linesList =  Arrays.asList(split);
+        for (String line : linesList){
+            List<String> stringList = new ArrayList<>();
+            for(int i = 0 ;i < line.length();i++){
+                stringList.add(String.valueOf(line.charAt(i)));
+            }
+            arrayList.add(stringList);
+        }
+        return arrayList;
+    }
+
+    /**
+     * 二维数组转换行String
+     */
+    public static String listToln(List<List<String>> stringList)  {
+        String lnString = "";
+        for(List<String>  lineStr : stringList){
+            String line = "";
+            for(String str : lineStr){
+                line = line + str;
+            }
+            lnString = lnString + line + "\n";
+        }
+        return lnString;
+    }
+
+
 
     /**
      * 二维组180度翻转

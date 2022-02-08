@@ -162,15 +162,22 @@
             </el-row>
               <el-row>
                 <el-col :span="12">
-                </el-col>
-                <el-col :span="12">
-
                       <el-form-item size="middle" label="重发间隔" prop="sendRetryInterval" label-width="100px">
                         <el-input v-model="form.sendRetryInterval"  placeholder="重发间隔" maxlength="30" >
                            <template slot="append">分</template>
                         </el-input>
                       </el-form-item>
-                        
+                </el-col>
+                <el-col :span="12">
+                  <el-form-item size="middle" label="颜色格式" prop="isColor10" label-width="100px">
+                    <el-checkbox v-model="form.isColor10">只发送10进制颜色</el-checkbox>
+                    <el-tooltip class="item" effect="light" content="" placement="right-start">
+                      <i class="el-icon-question" />
+                        <div slot="content">因为发送接口做了16进制颜色格式兼容，其他方式下载的xml弹幕文件中弹幕颜色为10进制。<br/>当10进制颜色6个字符时会直接被程序当成16进制颜色。勾选后不会做16进制颜色兼容
+                        </div>
+                    </el-tooltip>
+                  </el-form-item>
+      
                 </el-col>
               </el-row>
 
@@ -234,6 +241,7 @@ export default {
         pool: '0',
         sendPrefix: null,
         sendSuffix: null,
+        isColor10: false,
         sendFirstDmTime: null,
         sendFirstDmOffset: null,
         sendInterval: '20',

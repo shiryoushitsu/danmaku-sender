@@ -34,7 +34,7 @@ public class AviutlExo {
     @ApiModelProperty("生存时间/持续时间（秒）")
     private Double lifeTime;
 
-    @ApiModelProperty("移动时间（秒）")
+    @ApiModelProperty("移动时间（毫秒）")
     private Integer moveTime;
 
     @ApiModelProperty("延迟时间（毫秒）")

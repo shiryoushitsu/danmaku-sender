@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.hikari.danmaku.utils.AsciiUtil.*;
+
 
 @Api(tags = "弹幕工具箱")
 @RestController
@@ -64,7 +66,7 @@ public class ToolController {
 
     @ApiOperation("生成字符字")
     @GetMapping("/asciiText")
-    public ResponseResult getConfig(@RequestParam("content") String content ,@RequestParam("font") String font, @RequestParam("isChar") String isChar) throws Exception {
+    public ResponseResult getConfig(@RequestParam("content") String content ,@RequestParam("font") String font, @RequestParam("isChar") String isChar, @RequestParam("removeSpace") String removeSpace) throws Exception {
         FontFamily fontFamily = new FontFamily("方正像素16", 16,16 ,16);
 
         //循环字体枚举类
@@ -78,10 +80,20 @@ public class ToolController {
             // 逐字换行
             for(int i = 0;i < content.length();i++){
                 String word = String.valueOf(content.charAt(i));
-                str = str + AsciiUtil.getFontAscii(word, fontFamily) + "\n";
+                String singleStr = AsciiUtil.getFontAscii(word, fontFamily);
+                // 去除空格
+                if("true".equals(removeSpace)){
+                    singleStr = listToln(removeAroundSpace(lnToList(singleStr)));
+                }
+
+                str = str + singleStr + "\n";
             }
         }else {
             str = AsciiUtil.getFontAscii(content, fontFamily);
+            // 去除空格
+            if("true".equals(removeSpace)){
+                str = listToln(removeAroundSpace(lnToList(str)));
+            }
         }
 
         JSONObject rspJson = new JSONObject();

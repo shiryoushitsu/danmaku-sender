@@ -566,7 +566,7 @@ public class DanmakuController {
 
         //2、解析文件
         if("xml".equals(prefix)){
-            danmakuList = XmlUtil.analyseXml(filePath);
+            danmakuList = XmlUtil.analyseXml(filePath, sendDanmakuM1Vo.getIsColor10());
         }
 
         //3、初始化
@@ -599,12 +599,12 @@ public class DanmakuController {
 
         // 预览信息
         String preivewLog = "";
-        String configTxt = logService.configLog(sendDanmakuM1Vo);
+        String configTxt = logService.xmlConfigLog(sendDanmakuM1Vo);
         String linesTxt = "";
         int lrcCount = danmakuList.size();//弹幕次数
         for (int i = startRow ;i <= lrcCount;i++) {
             BaseDanmaku danmakuPreview = danmakuList.get(i-1);
-            String previewLog = logService.previewLog(i,Integer.valueOf(danmakuPreview.getStartTime()),(Integer.valueOf(danmakuPreview.getStartTime()) + timesOffset ),danmakuPreview.getContent());
+            String previewLog = logService.xmlPreviewLog(i, Integer.valueOf(danmakuPreview.getStartTime()), (Integer.valueOf(danmakuPreview.getStartTime()) + timesOffset ), danmakuPreview.getContent(),danmakuPreview);
             linesTxt += previewLog;
         }
         if(sendMode == -1){

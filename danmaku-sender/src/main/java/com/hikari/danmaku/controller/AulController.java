@@ -100,7 +100,8 @@ public class AulController {
         String xmlStr = ExoUtil.exoToXml(exoObjectList);
 
         //ex.预览
-        String preStr = "let s=`"+ xmlStr.replace("\n","") +"`" + "\n";
+        String previewXmlStr = ExoUtil.exoToPreviewXml(exoObjectList);
+        String preStr = "let s=`"+ previewXmlStr.replace("\n","") +"`" + "\n";
         preStr = preStr + "ldanmu=xml2danmu(s)"+ "\n";
         preStr = preStr + "window.ldldanmu[window.ldldanmu.length-1].ldanmu=ldanmu";
 

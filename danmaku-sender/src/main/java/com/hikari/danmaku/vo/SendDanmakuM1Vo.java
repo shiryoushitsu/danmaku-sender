@@ -17,4 +17,6 @@ public class SendDanmakuM1Vo extends SendDanmakuVo {
     private String sendSuffix;
 
 
+    @ApiModelProperty("isColor10")
+    private Boolean isColor10;
 }

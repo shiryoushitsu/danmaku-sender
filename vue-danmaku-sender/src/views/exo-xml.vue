@@ -25,26 +25,31 @@
           </el-col>
           <el-col :span="12">
               <el-form-item size="middle" label="线性加速" prop="isLinearSpeedup" label-width="100px">
-                  <el-checkbox v-model="form.isLinearSpeedup">是否线性加速</el-checkbox>
+                  <el-checkbox v-model="form.isLinearSpeedup">是否全部线性加速</el-checkbox>
               </el-form-item>
           </el-col>
         </el-row>
 
-        <!-- <el-row>
+        <el-row>
+
           <el-col :span="12">
-              <el-form-item size="middle" label="视频宽度" prop="cookie" label-width="100px">
-                    <el-input v-model="form.screenWidth"   placeholder="视频宽度"  />
-                  </el-form-item>
+              <el-form-item size="middle" label="中间点分句" prop="isPointCut" label-width="100px">
+                  <el-checkbox v-model="form.isPointCut">是否中间点强制分句</el-checkbox>
+              </el-form-item>
           </el-col>
           <el-col :span="12">
-                  <el-form-item size="middle" label="视频长度" prop="bvid" label-width="100px">
-                    <el-input v-model="form.screenHeight"  placeholder="请输入视频BV号"  />
-                  </el-form-item>
+              <el-form-item size="middle" label="修复闪帧" prop="isDelayEndTime" label-width="100px">
+                  <el-checkbox v-model="form.isDelayEndTime">是否结束时间延长50ms
+                          <el-tooltip class="item" effect="light" content="" placement="right-start">
+                      <i class="el-icon-question" />
+                        <div slot="content">解决PC端时间连续的两段弹幕之间闪烁问题<br/>但手机端可能会有字重叠观感</div>
+                    </el-tooltip>
+                  </el-checkbox>
+          
+              </el-form-item>
           </el-col>
-        </el-row> -->
-
-
-
+      
+        </el-row>
 
         <el-row>
           <el-col :span="12">
@@ -141,6 +146,8 @@ export default {
         isLayer: true,
         isOutline: false,
         isLinearSpeedup: false,
+        isDelayEndTime: true,
+        isPointCut: false,
         pool: '0',
         mode: '4',
         sendPrefix: null,

@@ -220,14 +220,14 @@ public class CommonUtil {
     }
 
 
-    //添加空格（M7逐字用）
-    public static String addBlankSpace(String word,int k){
+    // 往字前面添加空格（M7逐字用）
+    public static String addBlankSpace(String word, int k){
         String str = word;
         String fill = "";
-        for(int i=0;i<k;i++){
-            fill = fill +"　";//"　","  "
+        for(int i = 0; i < k; i++){
+            fill = fill + "　";//"　","  "
         }
-        str =fill + word;
+        str = fill + word;
         return str;
     }
 

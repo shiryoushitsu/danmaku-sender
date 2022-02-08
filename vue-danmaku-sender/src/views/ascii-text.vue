@@ -6,10 +6,22 @@
       <el-form ref="form" :model="form" label-width="80px" :rules="rules" :hide-required-asterisk="true" :validate-on-rule-change="false">
         
       <el-row :gutter="2">
-          <el-col :span="13">
+          <el-col :span="9">
        <el-input v-model="form.content"  placeholder="文字" />
           </el-col>
-            <el-col :span="4">
+          <el-col :span="4">
+              <el-select v-model="form.removeSpace"  placeholder="去除空格" >
+                <el-option
+                  v-for="item in spaceOptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+          </el-col>
+
+
+          <el-col :span="4">
               <el-select v-model="form.isChar"  placeholder="换行" >
                 <el-option
                   v-for="item in lineOptions"
@@ -44,8 +56,8 @@
   </div>
   <div style="display: flex;justify-content: center;">
     <!-- 显示区 --> 
-    <el-card style="width:1000px;min-height:400px;margin-top:22px;"> 
-      <el-input class="output" type="textarea" :rows="2" placeholder="显示区域" v-model="textarea" :autosize="{ minRows: 24, maxRows: 26}"> 
+    <el-card style="min-width:1000px;min-height:400px;margin-top:22px;"> 
+      <el-input class="output"  wrap="off" type="textarea" :rows="2" placeholder="显示区域" v-model="textarea" :autosize="{ minRows: 24, maxRows: 26}"> 
       </el-input> 
     </el-card> 
   </div>
@@ -87,6 +99,7 @@ export default {
       form:{
         content: '',
         isChar: 'true',
+        removeSpace: 'true',
         font: '方正像素16',
       },
       options: [{
@@ -98,9 +111,14 @@ export default {
       }, {
         value: '黑体',
         label: '黑体'
-      }, {
+      }, 
+      {
         value: 'JF Dot jiskan24',
         label: 'JF-Dot-jiskan24'
+      },
+      {
+        value: 'DFDotDotR12',
+        label: 'DF点々体12(日)'
       },
       {
         value: 'JF Dot K12',
@@ -121,6 +139,14 @@ export default {
       }, {
         value: 'false',
         label: '一行文字'
+      }
+      ],
+      spaceOptions: [{
+        value: 'true',
+        label: '去除四周空格'
+      }, {
+        value: 'false',
+        label: '保留空格'
       }
       ],
       rules: {     // 表单校验
@@ -153,7 +179,7 @@ export default {
               headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8' }
           }
           this.axios.get('/tool/asciiText', {
-            params: {content:this.form.content, font:this.form.font,isChar:this.form.isChar}
+            params: {content:this.form.content, font:this.form.font,isChar:this.form.isChar,removeSpace:this.form.removeSpace}
           }, config).then(res => {
             if(res.data.code == 200){
               this.textarea = res.data.data.asciiText

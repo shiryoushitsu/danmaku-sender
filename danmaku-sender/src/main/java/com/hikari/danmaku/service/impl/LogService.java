@@ -5,6 +5,7 @@ import cn.hutool.core.io.file.FileReader;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.hikari.danmaku.constants.Mode;
+import com.hikari.danmaku.entity.BaseDanmaku;
 import com.hikari.danmaku.service.intf.IFileService;
 import com.hikari.danmaku.service.intf.ILogService;
 import com.hikari.danmaku.vo.SendDanmakuM1Vo;
@@ -89,7 +90,20 @@ public class LogService implements ILogService {
     }
 
     @Override
-    public String previewLog(Integer currentRow,Integer startTime,Integer acturalTime, String content){
+    public  String xmlConfigLog(SendDanmakuVo sendDanmaku){
+        StringBuffer stringBuffer =new StringBuffer();
+        stringBuffer.append("───────────────────────开始──────────────────────\n");
+//        stringBuffer.append("发送状态：").append(sendDanmaku.getSendState()).append(" ");
+        stringBuffer.append("视频：").append(sendDanmaku.getVideoTitle()).append(" ");
+        stringBuffer.append("分P名：").append(sendDanmaku.getPartTitle()).append(" ");
+//        stringBuffer.append("发送条数：").append(fileLog.getCount()).append("\n");
+        stringBuffer.append("\n───────原时间───现时间───xml弹幕内容─────────────────────\n");
+
+        return  stringBuffer.toString();
+    }
+
+    @Override
+    public String previewLog(Integer currentRow, Integer startTime, Integer acturalTime, String content ){
         SimpleDateFormat hourFormat = new SimpleDateFormat("HH:mm:ss.SSS");
         SimpleDateFormat minuteFormat = new SimpleDateFormat("mm:ss.SSS");
         hourFormat.setTimeZone(TimeZone.getTimeZone("GMT+0"));
@@ -124,6 +138,44 @@ public class LogService implements ILogService {
         return  stringBuffer.toString();
     }
 
+
+    @Override
+    public String xmlPreviewLog(Integer currentRow,Integer startTime,Integer acturalTime, String content, BaseDanmaku baseDanmaku){
+        SimpleDateFormat hourFormat = new SimpleDateFormat("HH:mm:ss.SSS");
+        SimpleDateFormat minuteFormat = new SimpleDateFormat("mm:ss.SSS");
+        hourFormat.setTimeZone(TimeZone.getTimeZone("GMT+0"));
+        minuteFormat.setTimeZone(TimeZone.getTimeZone("GMT+0"));
+        String startTimeStr =  "";
+        String acturalTimeStr =  "";
+
+        int hour = 1000 * 60 * 60;
+        if(startTime >= hour){
+            startTimeStr = hourFormat.format(startTime);
+        }else {
+            startTimeStr = minuteFormat.format(startTime);
+        }
+        if(acturalTime >= hour){
+            acturalTimeStr = hourFormat.format(acturalTime);
+        }else {
+            acturalTimeStr = minuteFormat.format(acturalTime);
+        }
+        String space = "";
+        if(currentRow < 10){
+            space="  ";
+        }else {
+            space="";
+        }
+        StringBuffer stringBuffer =new StringBuffer();
+        stringBuffer.append("第").append(space).append(currentRow).append("句").append(" │ ");
+        stringBuffer.append(startTimeStr).append(" │ ");
+        stringBuffer.append(acturalTimeStr).append(" │ ");
+        stringBuffer.append(content).append(" │ ");
+        stringBuffer.append(baseDanmaku.getMode()).append(",");
+        stringBuffer.append(baseDanmaku.getFontSize()).append(",");
+        stringBuffer.append(baseDanmaku.getColor());
+        stringBuffer.append("\n");
+        return  stringBuffer.toString();
+    }
 
 
 
