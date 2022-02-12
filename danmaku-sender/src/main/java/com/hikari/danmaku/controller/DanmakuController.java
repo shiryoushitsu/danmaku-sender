@@ -566,8 +566,10 @@ public class DanmakuController {
 
         //2、解析文件
         if("xml".equals(prefix)){
-            danmakuList = XmlUtil.analyseXml(filePath, sendDanmakuM1Vo.getIsColor10());
+            danmakuList = XmlUtil.analyseXml(filePath, sendDanmakuM1Vo.getIsColor16());
         }
+        //按照时间排序
+        Collections.sort(danmakuList, (dm, t1) -> (int) (Double.valueOf(dm.getStartTime())* 1000 - Double.valueOf(t1.getStartTime())* 1000 ));
 
         //3、初始化
         danmakuService.initDanmakuXml(sendDanmakuM1Vo,danmakuList);

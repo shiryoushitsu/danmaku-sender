@@ -1,8 +1,10 @@
 package com.hikari.danmaku.entity;
 
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+@ApiModel("Aul描边效果")
 @Data
 public class AulOutline {
 

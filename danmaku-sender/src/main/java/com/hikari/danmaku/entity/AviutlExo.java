@@ -6,7 +6,7 @@ import lombok.Data;
 
 import java.util.List;
 
-@ApiModel(description = "发送弹幕请求类")
+@ApiModel("Aul实体类")
 @Data
 public class AviutlExo {
 
@@ -73,6 +73,8 @@ public class AviutlExo {
     @ApiModelProperty("中心Y坐标")
     private Integer centerY;
 
+    @ApiModelProperty("Y轴旋转")
+    private Integer YRotation = 0;
 
     @ApiModelProperty("Z轴旋转")
     private Integer ZRotation;
@@ -118,6 +120,9 @@ public class AviutlExo {
 
     @ApiModelProperty("处理状态（是否删除 1正常 0删除）")
     private Integer state = 1;
+
+    @ApiModelProperty("Aul对象是否显示有效（0正常 1无效）")
+    private Integer disable = 0;
 
 //    额外扩展效果
     @ApiModelProperty("阴影/复制文本对象操作")

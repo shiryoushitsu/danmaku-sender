@@ -1,8 +1,9 @@
 package com.hikari.danmaku.entity;
 
+import io.swagger.annotations.ApiModel;
 import java.util.List;
 
-//命令
+@ApiModel("svg命令")
 public class Vector {
 
     private String str;

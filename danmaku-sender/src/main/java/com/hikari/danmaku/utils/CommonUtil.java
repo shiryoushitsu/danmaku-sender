@@ -50,11 +50,12 @@ public class CommonUtil {
         return decimalFormat.format(number);
     }
 
+    //处理高级弹幕百分比坐标
     public static String  df3m7(double number){
         if(number >= 1){
             number = 0.999;
-        }else if (number <0 ){
-            number = 0;
+        }else if (number <=0 ){
+            number = 0.001;
         }
         DecimalFormat decimalFormat = new DecimalFormat("###################.###");
         return decimalFormat.format(number);

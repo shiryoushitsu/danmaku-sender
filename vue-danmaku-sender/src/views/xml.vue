@@ -50,6 +50,24 @@
           </el-form-item> 
          </el-col> 
         </el-row> 
+          <el-row>
+
+                <el-col :span="12">
+                  <el-form-item size="middle" label="颜色格式" prop="isColor16" label-width="100px">
+                    <el-checkbox v-model="form.isColor16">兼容16进制颜色发送</el-checkbox>
+                    <el-tooltip class="item" effect="light" content="" placement="right-start">
+                      <i class="el-icon-question" />
+                        <div slot="content">勾选兼容16进制颜色发送时，发送其他方式下载的原生xml文件（默认10进制颜色），弹幕颜色可能会不对
+                        </div>
+                    </el-tooltip>
+                  </el-form-item>
+      
+                </el-col>
+                  <el-col :span="12">
+ 
+                </el-col>
+              </el-row>
+
         <el-row> 
          <el-col :span="12"> 
          </el-col> 
@@ -81,7 +99,7 @@
     <el-tab-pane label="更多配置" name="second">
 
         <el-row>
-          <el-col :span="12" style="display:none">
+          <el-col :span="12" >
               <el-form-item size="middle" label="首句时间" prop="sendFirstDmTime" label-width="100px" >
                 <!-- <el-input v-model="form.sendFirstDmTime"  placeholder="非必填，首句时间，调整时间轴"  /> -->
                 <el-time-picker  
@@ -95,7 +113,7 @@
                 </el-time-picker>
               </el-form-item>
           </el-col>
-          <el-col :span="12"  style="display:none">
+          <el-col :span="12"  >
               <el-form-item size="middle" label="开始句" prop="sendStartDmRow" label-width="100px">
                 <el-input v-model="form.sendStartDmRow"  placeholder="配合发送测试弹幕使用，2为发送第二句歌词" maxlength="30" />
               </el-form-item>
@@ -104,7 +122,7 @@
 
    
         <el-row>
-          <el-col :span="12"  style="display:none">
+          <el-col :span="12"  >
             <el-form-item size="middle" label="时间补偿值" prop="sendFirstDmOffset" label-width="100px">
               <el-input v-model="form.sendFirstDmOffset"  placeholder="可正负数" maxlength="30" >
                   <template slot="append">毫秒</template>
@@ -169,14 +187,7 @@
                       </el-form-item>
                 </el-col>
                 <el-col :span="12">
-                  <el-form-item size="middle" label="颜色格式" prop="isColor10" label-width="100px">
-                    <el-checkbox v-model="form.isColor10">只发送10进制颜色</el-checkbox>
-                    <el-tooltip class="item" effect="light" content="" placement="right-start">
-                      <i class="el-icon-question" />
-                        <div slot="content">因为发送接口做了16进制颜色格式兼容，其他方式下载的xml弹幕文件中弹幕颜色为10进制。<br/>当10进制颜色6个字符时会直接被程序当成16进制颜色。勾选后不会做16进制颜色兼容
-                        </div>
-                    </el-tooltip>
-                  </el-form-item>
+   
       
                 </el-col>
               </el-row>
@@ -241,7 +252,7 @@ export default {
         pool: '0',
         sendPrefix: null,
         sendSuffix: null,
-        isColor10: false,
+        isColor16: false,
         sendFirstDmTime: null,
         sendFirstDmOffset: null,
         sendInterval: '20',

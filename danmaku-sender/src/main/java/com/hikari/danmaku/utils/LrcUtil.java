@@ -84,7 +84,7 @@ public class LrcUtil {
         }
         // 去除空格
         s = s.trim();
-        System.out.println(s);
+//        System.out.println(s);
         Matcher timeMatcher1 = Pattern.compile("(\\d{1,3}):(\\d{2})").matcher(s);
         Matcher timeMatcher2 = Pattern.compile("(\\d{1,2}):(\\d{2}):(\\d{2})").matcher(s);
         Matcher timeMatcher3 = Pattern.compile("(\\d{1,3}):(\\d{2})\\.(\\d{2,3})").matcher(s);

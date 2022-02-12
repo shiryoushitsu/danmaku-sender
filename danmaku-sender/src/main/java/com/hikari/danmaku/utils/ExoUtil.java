@@ -18,7 +18,7 @@ public class ExoUtil {
 
     // 15寸 760 510  38.8% / 14寸 850 560 43.4% /1px约等于0.002百分比
     public static void main(String[] args) {
-        String fileName = "2242";
+        String fileName = "春岚px版";
 //        String fileName = "hello闪字";
         String inputExoPath = "C:\\Users\\hikari\\Desktop\\"+  fileName+ ".exo";
         String outputXmlPath = "C:\\Users\\hikari\\Desktop\\"+ fileName +".xml";
@@ -30,10 +30,10 @@ public class ExoUtil {
         XmlEffect.setIsAdvanceStartTime(false);
         XmlEffect.setIsDelayEndTime(true); //结束延迟50ms
         XmlEffect.setIsForceLine(false);//是否换行都转成新文本
-        XmlEffect.setIsPercentage(true);//是否百分比
+        XmlEffect.setIsPercentage(false);//是否百分比
 //        XmlEffect.setIsColor10(true);
 
-        XmlEffect.setIsPointCut(true); // 中间点强制分句
+        XmlEffect.setIsPointCut(false); // 中间点强制分句
 //        XmlEffect.setForceLine(true);//是否换行都转成新文本（m7滚动配置）
 //        XmlEffect.setPercentage(false);//使用px（m7滚动配置）
 //             XmlEffect;
@@ -179,14 +179,11 @@ public class ExoUtil {
         }
 
 
-
-
-
-        //保留文本文件
+        //只保留文本和图形文件，去除不显示的文件（把勾选去掉的文件）
         Iterator<AviutlExo> itr = partExoList.iterator();
         while (itr.hasNext()){
             AviutlExo tmp = itr.next();
-            if(!("文本".equals(tmp.getObjName())||"图形".equals(tmp.getObjName()))){
+            if(!("文本".equals(tmp.getObjName())||"图形".equals(tmp.getObjName())) || 1 == tmp.getDisable()){
                 itr.remove();
             }
         }
@@ -487,7 +484,7 @@ public class ExoUtil {
                         System.out.println(exoBean);
                     }else {
                         //处理大于1和小于0情况
-                        startX = df3m7( (double)exoBean.getStartX()/exoBean.getWidth()) ;
+                        startX = df3m7( (double)exoBean.getStartX()/exoBean.getWidth());
                         startY = df3m7( (double)exoBean.getStartY()/exoBean.getHeight()) ;
                         endX =  df3m7( (double)exoBean.getEndX()/exoBean.getWidth()) ;
                         endY = df3m7( (double)exoBean.getEndY()/exoBean.getHeight()) ;
@@ -508,10 +505,12 @@ public class ExoUtil {
                     exoBean.setColor(ColorUtil.hexto10(exoBean.getColor()));
                 }
 
-                if(exoBean.getText()!= null && (exoBean.getText().contains("<") ||exoBean.getText().contains(">"))){
+                if(exoBean.getText()!= null && (exoBean.getText().contains("<") || exoBean.getText().contains(">"))  || exoBean.getText().contains("\\")){
                     String text = exoBean.getText();
                     text = text.replace("<","&lt;");
                     text = text.replace(">","&gt;");
+                    text = text.replace("\\","\\\\");
+                    text = text.replace("\\\\n","\\n");
                     exoBean.setText(text);
                 }
 
@@ -527,7 +526,7 @@ public class ExoUtil {
                 danmakuContentStr.append("\"").append(exoBean.getLifeTime()).append("\"").append(",");
                 danmakuContentStr.append("\"").append(exoBean.getText()).append("\"").append(",");
                 danmakuContentStr.append(exoBean.getZRotation()).append(",");//Z_Rotation
-                danmakuContentStr.append(0).append(",");//Y_Rotation
+                danmakuContentStr.append(exoBean.getYRotation()).append(",");//Y_Rotation
                 danmakuContentStr.append("\"").append(endX).append("\"").append(",");
                 danmakuContentStr.append("\"").append(endY).append("\"").append(",");
 //                danmakuStr.append(endX).append(",");
@@ -881,7 +880,7 @@ public class ExoUtil {
                     exoBean.setText(text);
                     break;
                 case "X":
-                    if("标准变换".equals(exoBean.getCurrentName())) {
+                    if("标准变换".equals(exoBean.getCurrentName()) || "拓展变换".equals(exoBean.getCurrentName())) {
                         if (value.contains(",")) {
                             String[] xArray = value.split(",");
                             Integer x1 = Double.valueOf(xArray[0]).intValue();
@@ -912,7 +911,7 @@ public class ExoUtil {
 
                     break;
                 case "Y":
-                    if("标准变换".equals(exoBean.getCurrentName())) {
+                    if("标准变换".equals(exoBean.getCurrentName()) || "拓展变换".equals(exoBean.getCurrentName())) {
                         if(value.contains(",")){
                             String[] yArray = value.split(",");
                             exoBean.setY(Double.valueOf(yArray[0]).intValue());
@@ -944,6 +943,9 @@ public class ExoUtil {
                     }
                     exoBean.set_name(value);
                     exoBean.setCurrentName(value);
+                    break;
+                case "_disable":
+                    exoBean.setDisable(Integer.valueOf(value));
                     break;
                 case "start":
                     exoBean.setStart(Integer.valueOf(value));
@@ -1027,6 +1029,32 @@ public class ExoUtil {
                         }
                         exoBean.setZRotation(zRotate);
                     }
+                    break;
+                case "Z轴旋转":
+                    if (value.contains(",")) {
+                        String[] ZRotateArray = value.split(",");
+                        Integer startRotate = Double.valueOf(ZRotateArray[0]).intValue();
+                        Integer endRotate = Double.valueOf(ZRotateArray[1]).intValue();
+                        if(ZRotateArray.length > 3){
+                            String access = ZRotateArray[3];
+                            exoBean.setEasingZRotation(Integer.valueOf(access));
+                        }
+                        exoBean.setZRotation(startRotate);
+                        exoBean.setEndZRotation(endRotate);
+                    } else {
+                        int zRotate = Double.valueOf(value).intValue();
+                        if(zRotate < 0) {
+                            zRotate = zRotate + 360;
+                        }
+                        exoBean.setZRotation(zRotate);
+                    }
+                    break;
+                case "Y轴旋转":
+                    int yRotate = Double.valueOf(value).intValue();
+                    if(yRotate < 0) {
+                        yRotate = yRotate + 360;
+                    }
+                    exoBean.setYRotation(yRotate);
                     break;
                 case "chain":
                     exoBean.setChain(Double.valueOf(value).intValue());

@@ -1,9 +1,10 @@
 package com.hikari.danmaku.entity;
 
+import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-//贝塞尔
+@ApiModel(description = "贝塞尔")
 @Data
 @AllArgsConstructor
 public class CubicBezier {

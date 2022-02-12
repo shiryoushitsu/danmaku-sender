@@ -22,7 +22,7 @@ public class XmlUtil {
         System.out.println(XmlUtil.m7ToBas("C:\\杂物\\潜水艇.xml"));
     }
 
-    public static List<BaseDanmaku> analyseXml(String url ,Boolean isColor10) throws Exception{
+    public static List<BaseDanmaku> analyseXml(String url ,Boolean isColor16) throws Exception{
         SAXReader reader = new SAXReader();
         String path = url;
         File file = new File(url);  //将文件读取，这样路径如果有中文一样可以正常读取
@@ -45,7 +45,7 @@ public class XmlUtil {
             danmakuEntity.setMode(Integer.valueOf(attrArray[1]) );
             danmakuEntity.setFontSize(Integer.valueOf(attrArray[2]));
             String strHex ="";
-            if(attrArray[3].length() == 6 && !isColor10){
+            if(attrArray[3].length() == 6 && isColor16){
                 strHex = attrArray[3];
             }else {
                 int valueTen = Integer.valueOf(attrArray[3]);
@@ -62,7 +62,10 @@ public class XmlUtil {
             danmakuEntity.setPool(Integer.valueOf(attrArray[5]));
             danmakuEntity.setUid(attrArray[6]);
             danmakuEntity.setRowId(attrArray[7]);
-            danmakuEntity.setContent(danmaku.getText());
+
+            //全弹幕下载的左斜杠换行符转换成现在的换行符
+            String danmakuTextStr = danmaku.getText().replaceAll("/n","\\\\n");
+            danmakuEntity.setContent(danmakuTextStr);
 
             //普通弹幕
             // <d p="2.89900,1,25,16777215,1595498498,0,f4e96d98,35838400054427653">高产似那啥</d>

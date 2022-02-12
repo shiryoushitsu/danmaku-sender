@@ -142,7 +142,7 @@ export default {
       form:{
         screenWidth: 850,
         screenHeight: 560,
-        isPercentage: true,
+        isPercentage: false,
         isLayer: true,
         isOutline: false,
         isLinearSpeedup: false,
