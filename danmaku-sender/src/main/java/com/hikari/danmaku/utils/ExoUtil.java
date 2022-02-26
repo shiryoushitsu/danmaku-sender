@@ -983,13 +983,11 @@ public class ExoUtil {
                          startTime = startTime - 0.05;
                         }
                     }
-                    startTime = startTime + 0.1;
                     exoBean.setStartTime(startTime);
                     break;
                 case "end":
                     exoBean.setEnd(Integer.valueOf(value));
                     double endTime = d2((Integer.valueOf(value)) / 30D);
-                    endTime = endTime + 0.1;
                     if(xmlEffect != null){
                         //【针对pc端闪频问题】生存时间小于50ms转为60ms
                         if( (endTime - exoBean.getStartTime() )<= 0.05){
