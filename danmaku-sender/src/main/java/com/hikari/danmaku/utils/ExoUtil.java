@@ -18,7 +18,7 @@ public class ExoUtil {
 
     // 15寸 760 510  38.8% / 14寸 850 560 43.4% /1px约等于0.002百分比
     public static void main(String[] args) {
-        String fileName = "春岚px版";
+        String fileName = "生日蛋糕";
 //        String fileName = "hello闪字";
         String inputExoPath = "C:\\Users\\hikari\\Desktop\\"+  fileName+ ".exo";
         String outputXmlPath = "C:\\Users\\hikari\\Desktop\\"+ fileName +".xml";
@@ -183,7 +183,7 @@ public class ExoUtil {
         Iterator<AviutlExo> itr = partExoList.iterator();
         while (itr.hasNext()){
             AviutlExo tmp = itr.next();
-            if(!("文本".equals(tmp.getObjName())||"图形".equals(tmp.getObjName())) || 1 == tmp.getDisable()){
+            if(!("文本".equals(tmp.getObjName()) ||"图形".equals(tmp.getObjName()) ||"组控制".equals(tmp.getObjName()) ) || 1 == tmp.getDisable()){
                 itr.remove();
             }
         }
@@ -244,6 +244,34 @@ public class ExoUtil {
         }
         //再次去重
         removeDuplicateWithOrder(partExoList);
+
+        // 组控制坐标处理（找出相同start，对坐标进行偏移）
+        for(AviutlExo aviutlExo : partExoList){
+            if("组控制".equals(aviutlExo.get_name())){
+                int offsetStartX = aviutlExo.getStartX() - aviutlExo.getWidth()/2;
+                int offsetEndX = aviutlExo.getEndX() - aviutlExo.getWidth()/2;
+                int offsetStartY = aviutlExo.getStartY() - aviutlExo.getHeight()/2;
+                int offsetEndY = aviutlExo.getEndY() - aviutlExo.getHeight()/2;
+                int start = aviutlExo.getStart();
+                for(AviutlExo startEqualExo: partExoList){
+                    if(start == startEqualExo.getStart()){
+                        startEqualExo.setStartX(startEqualExo.getStartX() + offsetStartX);
+                        startEqualExo.setEndX(startEqualExo.getEndX() + offsetEndX);
+                        startEqualExo.setStartY(startEqualExo.getStartY() + offsetStartY);
+                        startEqualExo.setEndY(startEqualExo.getEndY() + offsetEndY);
+                    }
+                }
+            }
+        }
+        Iterator<AviutlExo> itrControl = partExoList.iterator();
+        while (itrControl.hasNext()){
+            AviutlExo tmp = itrControl.next();
+            if("组控制".equals(tmp.getObjName())){
+                itrControl.remove();
+            }
+        }
+
+
 
         //阴影处理
         for(int s = 0;s < partExoList.size(); s++){
@@ -880,7 +908,7 @@ public class ExoUtil {
                     exoBean.setText(text);
                     break;
                 case "X":
-                    if("标准变换".equals(exoBean.getCurrentName()) || "拓展变换".equals(exoBean.getCurrentName())) {
+                    if("标准变换".equals(exoBean.getCurrentName()) || "拓展变换".equals(exoBean.getCurrentName()) || "组控制".equals(exoBean.getCurrentName())) {
                         if (value.contains(",")) {
                             String[] xArray = value.split(",");
                             Integer x1 = Double.valueOf(xArray[0]).intValue();
@@ -911,7 +939,7 @@ public class ExoUtil {
 
                     break;
                 case "Y":
-                    if("标准变换".equals(exoBean.getCurrentName()) || "拓展变换".equals(exoBean.getCurrentName())) {
+                    if("标准变换".equals(exoBean.getCurrentName()) || "拓展变换".equals(exoBean.getCurrentName()) || "组控制".equals(exoBean.getCurrentName())) {
                         if(value.contains(",")){
                             String[] yArray = value.split(",");
                             exoBean.setY(Double.valueOf(yArray[0]).intValue());
@@ -955,11 +983,13 @@ public class ExoUtil {
                          startTime = startTime - 0.05;
                         }
                     }
+                    startTime = startTime + 0.1;
                     exoBean.setStartTime(startTime);
                     break;
                 case "end":
                     exoBean.setEnd(Integer.valueOf(value));
                     double endTime = d2((Integer.valueOf(value)) / 30D);
+                    endTime = endTime + 0.1;
                     if(xmlEffect != null){
                         //【针对pc端闪频问题】生存时间小于50ms转为60ms
                         if( (endTime - exoBean.getStartTime() )<= 0.05){

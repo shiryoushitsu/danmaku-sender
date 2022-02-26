@@ -568,8 +568,6 @@ public class DanmakuController {
         if("xml".equals(prefix)){
             danmakuList = XmlUtil.analyseXml(filePath, sendDanmakuM1Vo.getIsColor16());
         }
-        //按照时间排序
-        Collections.sort(danmakuList, (dm, t1) -> (int) (Double.valueOf(dm.getStartTime())* 1000 - Double.valueOf(t1.getStartTime())* 1000 ));
 
         //3、初始化
         danmakuService.initDanmakuXml(sendDanmakuM1Vo,danmakuList);
@@ -590,7 +588,14 @@ public class DanmakuController {
         if(sendDanmakuM1Vo.getSendStartDmRow() != null){
             startRow = sendDanmakuM1Vo.getSendStartDmRow() ;
         }
+        //按照发送时间排序
+        System.out.println("时间重新排序");
+        Collections.sort(danmakuList, (dm, t1) -> (int) (Double.valueOf(dm.getTimestamp()) - Double.valueOf(t1.getTimestamp()) ));
+
+
         if(StringUtils.isNotBlank(sendDanmakuM1Vo.getSendFirstDmTime())){
+
+
             String fdt = sendDanmakuM1Vo.getSendFirstDmTime();
             int sendFirstDmTime = parseOffset(fdt); // 修改后第一句时间
             int orgFirstDmTime = Integer.valueOf(danmakuList.get(0).getStartTime())  ; // 原始第一句时间
