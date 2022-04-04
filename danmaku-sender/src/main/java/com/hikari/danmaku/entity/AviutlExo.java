@@ -118,6 +118,9 @@ public class AviutlExo {
     @ApiModelProperty("文本字数")
     private Integer textLength;
 
+    @ApiModelProperty("类型（图形类型 0纯屏 1圆）")
+    private Integer type;
+
     @ApiModelProperty("处理状态（是否删除 1正常 0删除）")
     private Integer state = 1;
 

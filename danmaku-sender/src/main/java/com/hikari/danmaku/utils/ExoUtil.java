@@ -5,6 +5,8 @@ import cn.hutool.core.util.NumberUtil;
 import com.hikari.danmaku.constants.Easing;
 import com.hikari.danmaku.entity.*;
 import org.springframework.beans.BeanUtils;
+import org.springframework.context.annotation.Bean;
+
 import java.io.*;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -18,7 +20,8 @@ public class ExoUtil {
 
     // 15寸 760 510  38.8% / 14寸 850 560 43.4% /1px约等于0.002百分比
     public static void main(String[] args) {
-        String fileName = "生日蛋糕";
+//        String fileName = "宝马2";
+        String fileName = "神一样全";
 //        String fileName = "hello闪字";
         String inputExoPath = "C:\\Users\\hikari\\Desktop\\"+  fileName+ ".exo";
         String outputXmlPath = "C:\\Users\\hikari\\Desktop\\"+ fileName +".xml";
@@ -30,8 +33,8 @@ public class ExoUtil {
         XmlEffect.setIsAdvanceStartTime(false);
         XmlEffect.setIsDelayEndTime(true); //结束延迟50ms
         XmlEffect.setIsForceLine(false);//是否换行都转成新文本
-        XmlEffect.setIsPercentage(false);//是否百分比
-//        XmlEffect.setIsColor10(true);
+        XmlEffect.setIsPercentage(true);//是否百分比
+        XmlEffect.setIsColor10(false);
 
         XmlEffect.setIsPointCut(false); // 中间点强制分句
 //        XmlEffect.setForceLine(true);//是否换行都转成新文本（m7滚动配置）
@@ -311,7 +314,7 @@ public class ExoUtil {
                     continue;
                 }
 
-                List<Position> simpleInterval = simpleInterval(outlineSize);
+                List<Position> simpleInterval = normalInterval(outlineSize);
                 for(Position positionInterval : simpleInterval){
                     AviutlExo outlineTextExo = new AviutlExo();
                     BeanUtils.copyProperties(partExoList.get(o), outlineTextExo);
@@ -420,6 +423,10 @@ public class ExoUtil {
             }
         }
         partExoList.addAll(addList);
+
+
+        // 2.8 处理图形圆
+        partExoList = parseCircle(partExoList);
 
         //2.9 分开处理anm效果 todo
         List<String> anmList = anmList();
@@ -582,18 +589,21 @@ public class ExoUtil {
                     overLength.add("第" + (i + 1)  + "条弹幕字体大小为" + exoBean.getSize() + "超过限制");
                 }
 
-            }else if("图形".equals(exoBean.getObjName()) ){
-                previewBodyStr.append("<d p=\""+ exoBean.getStartTime() +",7,127,"+ ColorUtil.hexto10(exoBean.getColor())+",null,0,null,null\">[\"0\",\"0\",\"1-1\",\""+exoBean.getLifeTime()+"\",\"███████████\\n███████████\\n███████████\\n███████████\\n███████████\",0,0,\"0\",\"0\",\""+exoBean.getMoveTime()+"\",\"0\",0,\"Microsoft YaHei\",0]</d>\n");
-                if(currentXmlEffect.getIsColor10()){
-                    exoBean.setColor(ColorUtil.hexto10(exoBean.getColor()));
+            }else if("图形".equals(exoBean.getObjName())){
+                if(0 == exoBean.getType()){
+                    // 纯色
+                    previewBodyStr.append("<d p=\""+ exoBean.getStartTime() +",7,127,"+ ColorUtil.hexto10(exoBean.getColor())+",null,0,null,null\">[\"0\",\"0\",\"1-1\",\""+exoBean.getLifeTime()+"\",\"███████████\\n███████████\\n███████████\\n███████████\\n███████████\",0,0,\"0\",\"0\",\""+exoBean.getMoveTime()+"\",\"0\",0,\"Microsoft YaHei\",0]</d>\n");
+                    if(currentXmlEffect.getIsColor10()){
+                        exoBean.setColor(ColorUtil.hexto10(exoBean.getColor()));
+                    }
+                    String bgGraph = "<d p=\""+ exoBean.getStartTime() +",7,127,"+exoBean.getColor()+",null,0,null,null\">[\"0\",\"0\",\"1-1\",\""+exoBean.getLifeTime()+"\",\"███████████\\n███████████\\n███████████\\n███████████\\n███████████\",0,0,\"0\",\"0\",\""+exoBean.getMoveTime()+"\",\"0\",0,\"Microsoft YaHei\",0]</d>\n";
+                    bodyStr.append(bgGraph);
+                }else if(1 == exoBean.getType()){
+                    // 圆
+
+
                 }
-                String bgGraph = "<d p=\""+ exoBean.getStartTime() +",7,127,"+exoBean.getColor()+",null,0,null,null\">[\"0\",\"0\",\"1-1\",\""+exoBean.getLifeTime()+"\",\"███████████\\n███████████\\n███████████\\n███████████\\n███████████\",0,0,\"0\",\"0\",\""+exoBean.getMoveTime()+"\",\"0\",0,\"Microsoft YaHei\",0]</d>\n"
-//                        +
-//                        "<d p=\""+ exoBean.getStartTime() +",7,127,"+exoBean.getColor()+",null,0,null,null\">[\"0.079\",\"0\",\"1-1\",\""+exoBean.getLifeTime()+"\",\"███████████\\n███████████\\n███████████\\n███████████\\n███████████\",0,0,\"0.079\",\"0\",\""+exoBean.getMoveTime()+"\",\"0\",0,\"SimHei\",0]</d>\n" +
-//                        "<d p=\""+ exoBean.getStartTime() +",7,127,"+exoBean.getColor()+",null,0,null,null\">[\"0\",\"0.118\",\"1-1\",\""+exoBean.getLifeTime()+"\",\"███████████\\n███████████\\n███████████\\n███████████\\n███████████\",0,0,\"0\",\"0.118\",\""+exoBean.getMoveTime()+"\",\"0\",0,\"SimHei\",0]</d>\n" +
-//                        "<d p=\""+ exoBean.getStartTime() +",7,127,"+exoBean.getColor()+",null,0,null,null\">[\"0.079\",\"0.118\",\"1-1\",\""+exoBean.getLifeTime()+"\",\"███████████\\n███████████\\n███████████\\n███████████\\n███████████\",0,0,\"0.079\",\"0.118\",\""+exoBean.getMoveTime()+"\",\"0\",0,\"SimHei\",0]</d>\n"
-                        ;
-                bodyStr.append(bgGraph);
+
             }
         }
         StringBuffer endStr = new StringBuffer();
@@ -700,7 +710,7 @@ public class ExoUtil {
                 bodyStr.append(danmakuStr);
                 previewBodyStr.append(danmakuPreviewStr);
 
-            }else if("图形".equals(exoBean.getObjName()) ){
+            }else if("图形".equals(exoBean.getObjName())  && 0 == exoBean.getType()){
                 previewBodyStr.append("<d p=\""+ exoBean.getStartTime() +",7,127,"+ ColorUtil.hexto10(exoBean.getColor())+",null,0,null,null\">[\"0\",\"0\",\"1-1\",\""+exoBean.getLifeTime()+"\",\"███████████\\n███████████\\n███████████\\n███████████\\n███████████\",0,0,\"0\",\"0\",\""+exoBean.getMoveTime()+"\",\"0\",0,\"Microsoft YaHei\",0]</d>\n");
                 if(currentXmlEffect.getIsColor10()){
                     exoBean.setColor(ColorUtil.hexto10(exoBean.getColor()));
@@ -1027,7 +1037,7 @@ public class ExoUtil {
                     }
                     break;
                 case "大小":
-                    if("文本".equals(exoBean.getCurrentName())){
+                    if("文本".equals(exoBean.getCurrentName())||"图形".equals(exoBean.getCurrentName())){
                         exoBean.setSize(Double.valueOf(value).intValue());
                     }
                     break;
@@ -1083,6 +1093,9 @@ public class ExoUtil {
                         yRotate = yRotate + 360;
                     }
                     exoBean.setYRotation(yRotate);
+                    break;
+                case "type":
+                    exoBean.setType(Integer.valueOf(value));
                     break;
                 case "chain":
                     exoBean.setChain(Double.valueOf(value).intValue());
@@ -1429,6 +1442,25 @@ public class ExoUtil {
         return positionList;
     }
 
+    //m7边框偏差值（8条）
+    public static List<Position> normalInterval(Integer interval) {
+        List<Position> positionList = new ArrayList<>();
+
+        positionList.add(new Position( 0, - interval));
+        positionList.add(new Position( 0, + interval));
+        positionList.add(new Position( + interval,0));
+        positionList.add(new Position( - interval,0));
+
+        positionList.add(new Position( - interval, - interval));
+        positionList.add(new Position( - interval, + interval));
+        positionList.add(new Position( + interval, + interval));
+        positionList.add(new Position( + interval, - interval));
+
+        return positionList;
+    }
+
+
+
 
     public static boolean checkAnmEffect(List<AviutlExo> partExoList, int k) {
             AviutlExo aviExo = partExoList.get(k);
@@ -1463,6 +1495,36 @@ public class ExoUtil {
                 }
             }
         return flag;
+    }
+
+    // 圆转换
+    public static  List<AviutlExo> parseCircle(List<AviutlExo> partExoList) {
+        List<AviutlExo> newExoList = new ArrayList<>();
+        for(AviutlExo exo :partExoList){
+            if("图形".equals(exo.getObjName()) && 1 == exo.getType()){
+                for(int i = 0; i < 36 ;i++){
+                    AviutlExo newTextBGExo = new AviutlExo();
+                    BeanUtils.copyProperties(exo,newTextBGExo);
+                    newTextBGExo.setObjName("文本");
+                    newTextBGExo.setZRotation(i * 10);
+                    newTextBGExo.setFont("SimHei");
+                    newTextBGExo.setText("　　　　　｜");
+                    newTextBGExo.setSize((int)Math.floor(newTextBGExo.getSize()/10.8));
+                    newExoList.add(newTextBGExo);
+                }
+                exo.setState(0);
+            }
+        }
+        partExoList.addAll(newExoList);
+
+        Iterator<AviutlExo> itrControl = partExoList.iterator();
+        while (itrControl.hasNext()){
+            AviutlExo tmp = itrControl.next();
+            if(0 == tmp.getState()){
+                itrControl.remove();
+            }
+        }
+        return partExoList;
     }
 
 

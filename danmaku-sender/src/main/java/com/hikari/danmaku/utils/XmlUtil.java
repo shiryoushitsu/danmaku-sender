@@ -1,8 +1,10 @@
 package com.hikari.danmaku.utils;
 
 import com.hikari.danmaku.constants.Mode;
+import com.hikari.danmaku.entity.AviutlExo;
 import com.hikari.danmaku.entity.BaseDanmaku;
 import com.hikari.danmaku.entity.SeniorDanmaku;
+import com.hikari.danmaku.entity.XmlEffect;
 import com.hikari.danmaku.vo.SendDanmakuM1Vo;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Attribute;
@@ -16,10 +18,44 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import static com.hikari.danmaku.utils.CommonUtil.df3m7;
+
 public class XmlUtil {
     public static void main(String[] args) throws Exception {
 //        System.out.println(XmlUtil.m7ToBas("C:\\杂物\\放弃音乐.xml"));
-        System.out.println(XmlUtil.m7ToBas("C:\\杂物\\潜水艇.xml"));
+//        System.out.println(XmlUtil.m7ToBas("C:\\杂物\\潜水艇.xml"));
+        String fileName = "信者";
+//        String fileName = "速度线";
+//        String fileName = "hello闪字";
+        String inputExoPath = "C:\\Users\\hikari\\Desktop\\"+  fileName+ ".exo";
+        String outputXmlPath = "C:\\Users\\hikari\\Desktop\\"+ fileName +".xml";
+
+        int screenX = 665;
+        int screenY = 375;
+        List<BaseDanmaku> dmList = analyseXml(outputXmlPath,true);
+
+//        List<SeniorDanmaku> sdmList = new ArrayList<>();
+//        for(BaseDanmaku baseDanmaku : dmList){
+//            SeniorDanmaku sdm = baseToSeniorDanmaku(baseDanmaku);
+//            sdm.setStartX( sdm.getStartX() + 92);
+//            sdm.setStartY( Math.ceil(sdm.getStartY() + 92));
+//
+//            sdm.setEndX( Math.ceil(sdm.getEndX() + 92));
+//            sdm.setEndY( Math.ceil(sdm.getEndY() + 92));
+//
+//            String reContent = DanmakuUtil.wrapperDanmaku(sdm);
+//            baseDanmaku.setContent(reContent);
+//            sdmList.add(sdm);
+//        }
+        // 重组xml
+        System.out.println(buildSendXml(dmList));
+
+        // 插件预览用xml
+        String previewXmlStr = previewSendXml(dmList);
+        String preStr = "let s=`"+ previewXmlStr.replace("\n","") +"`" + "\n";
+        preStr = preStr + "ldanmu=xml2danmu(s)"+ "\n";
+        preStr = preStr + "window.ldldanmu[window.ldldanmu.length-1].ldanmu=ldanmu";
+        System.out.println(preStr);
     }
 
     public static List<BaseDanmaku> analyseXml(String url ,Boolean isColor16) throws Exception{
@@ -112,7 +148,7 @@ public class XmlUtil {
         return danmakuEntity;
     }
 
-    // 组装xml
+    // 组装xml（传高级弹幕对象，返回一条xml弹幕）
     public static String buildDanmakuXml(SeniorDanmaku seniorDanmaku) {
         StringBuffer danmakuStr = new StringBuffer();
         danmakuStr.append("<d p=\"");
@@ -128,12 +164,10 @@ public class XmlUtil {
         return danmakuStr.toString();
     }
 
-
     // 解析高级弹幕属性（普通弹幕转高级弹幕）
     public static SeniorDanmaku baseToSeniorDanmaku(BaseDanmaku baseDanmaku) {
         SeniorDanmaku seniorDanmaku = new SeniorDanmaku();
         BeanUtils.copyProperties(baseDanmaku, seniorDanmaku);
-
 
         String regEx="[\\[\\]\"]";
         String danmakuTextStr = baseDanmaku.getContent().replaceAll(regEx,"");//不想保留原来的字符串可以直接写成 “str = str.replaceAll(regEX,aa);”
@@ -144,7 +178,13 @@ public class XmlUtil {
         seniorDanmaku.setAlpha(textArray[2]);
         seniorDanmaku.setDuration(Double.parseDouble(textArray[3]));
         seniorDanmaku.setText(textArray[4]);
+        if(textArray[5].equals("")){
+            textArray[5] = "0";
+        }
         seniorDanmaku.setZRotate(Integer.valueOf(textArray[5]));
+        if(textArray[6].equals("")){
+            textArray[6] = "0";
+        }
         seniorDanmaku.setYRotate(Integer.valueOf(textArray[6]));
         seniorDanmaku.setEndX(Double.parseDouble(textArray[7]));
         seniorDanmaku.setEndY(Double.parseDouble(textArray[8]));
@@ -294,4 +334,86 @@ public class XmlUtil {
         return danmakuStr.toString();
     }
 
+
+
+
+    // 预览xml
+    public static String previewSendXml(List<BaseDanmaku> xmlDanmaku){
+        StringBuffer headStr = new StringBuffer();
+        headStr.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?><i>\n");
+        StringBuffer previewBodyStr = new StringBuffer();
+        for(int i = 0;i < xmlDanmaku.size(); i++) {
+            BaseDanmaku danmaku = xmlDanmaku.get(i);
+            StringBuffer danmakuPreviewStr = new StringBuffer();
+            danmakuPreviewStr.append("<d p=\"");
+            danmakuPreviewStr.append(danmaku.getStartTime()).append(",");
+            danmakuPreviewStr.append(danmaku.getMode()).append(",");
+            danmakuPreviewStr.append(danmaku.getFontSize()).append(",");
+            danmakuPreviewStr.append(ColorUtil.hexto10(danmaku.getColor())).append(",");
+            danmakuPreviewStr.append("null,0,null,null\">");
+//            if(currentXmlEffect.getIsColor10()){
+//                exoBean.setColor(ColorUtil.hexto10(exoBean.getColor()));
+//            }
+//
+            String content = danmaku.getContent();
+            content = content.replace("\\","\\\\");
+            content = content.replace("`","&apos;");
+            danmaku.setContent(content);
+            if(danmaku.getContent()!= null && (danmaku.getContent().contains("<") ||danmaku.getContent().contains(">"))){
+                String text = danmaku.getContent();
+                text = text.replace("<","&lt;");
+                text = text.replace(">","&gt;");
+                danmaku.setContent(text);
+            }
+            danmakuPreviewStr.append(danmaku.getContent()).append("</d>\n");
+            previewBodyStr.append(danmakuPreviewStr);
+        }
+        StringBuffer endStr = new StringBuffer();
+        endStr.append("</i>");
+
+        StringBuffer previewXml = new StringBuffer();
+        previewXml.append(headStr).append(previewBodyStr).append(endStr);
+        return  previewXml.toString();
+
+    }
+
+    // 预览xml
+    public static String buildSendXml(List<BaseDanmaku> xmlDanmaku){
+        StringBuffer headStr = new StringBuffer();
+        headStr.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?><i>\n");
+        StringBuffer previewBodyStr = new StringBuffer();
+        for(int i = 0;i < xmlDanmaku.size(); i++) {
+            BaseDanmaku danmaku = xmlDanmaku.get(i);
+            StringBuffer danmakuPreviewStr = new StringBuffer();
+            danmakuPreviewStr.append("<d p=\"");
+            danmakuPreviewStr.append(danmaku.getStartTime()).append(",");
+            danmakuPreviewStr.append(danmaku.getMode()).append(",");
+            danmakuPreviewStr.append(danmaku.getFontSize()).append(",");
+            danmakuPreviewStr.append(ColorUtil.hexto10(danmaku.getColor())).append(",");
+            danmakuPreviewStr.append("null,0,null,null\">");
+//            if(currentXmlEffect.getIsColor10()){
+//                exoBean.setColor(ColorUtil.hexto10(exoBean.getColor()));
+//            }
+//
+            String content = danmaku.getContent();
+//            content = content.replace("\\","\\\\");
+            content = content.replace("`","&apos;");
+            danmaku.setContent(content);
+            if(danmaku.getContent()!= null && (danmaku.getContent().contains("<") ||danmaku.getContent().contains(">"))){
+                String text = danmaku.getContent();
+                text = text.replace("<","&lt;");
+                text = text.replace(">","&gt;");
+                danmaku.setContent(text);
+            }
+            danmakuPreviewStr.append(danmaku.getContent()).append("</d>\n");
+            previewBodyStr.append(danmakuPreviewStr);
+        }
+        StringBuffer endStr = new StringBuffer();
+        endStr.append("</i>");
+
+        StringBuffer previewXml = new StringBuffer();
+        previewXml.append(headStr).append(previewBodyStr).append(endStr);
+        return  previewXml.toString();
+
+    }
 }

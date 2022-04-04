@@ -17,6 +17,7 @@ import com.hikari.danmaku.vo.SendDanmakuM7Vo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
@@ -620,6 +621,21 @@ public class DanmakuController {
             return Response.makeOKRsp(preivewLog);
         }
 
+        if(sendMode == -2){
+            for(BaseDanmaku danmaku : danmakuList){
+                int st = Integer.valueOf(danmaku.getStartTime());
+                double dStartTime = (double)st;
+                danmaku.setStartTime(String.valueOf(dStartTime/1000));
+            }
+            String previewXmlStr = XmlUtil.previewSendXml(danmakuList);
+            // 插件预览用xml
+            String preStr = "let s=`"+ previewXmlStr.replace("\n","") +"`" + "\n";
+            preStr = preStr + "ldanmu=xml2danmu(s)"+ "\n";
+            preStr = preStr + "window.ldldanmu[window.ldldanmu.length-1].ldanmu=ldanmu";
+            System.out.println(preStr);
+            return Response.makeOKRsp(preStr);
+        }
+
         // 测试发送配置
         if(sendMode == 0){
             lrcCount = startRow + 2;   //弹幕次数【通过修改lrcCount可只发送3条】
@@ -794,5 +810,218 @@ public class DanmakuController {
         return Response.makeOKRsp(fileService.getFileLog(fileLogPath));
     }
 
+
+    @ApiOperation("发送普通弹幕歌词")
+    @PostMapping("/previewSendDanmakuM1")
+    public ResponseResult<Map<String,Object>> previewSendDanmakuM1(MultipartFile file,SendDanmakuM1Vo sendDanmakuM1Vo) throws Exception{
+        //1、处理文件
+        String filePath = this.fileService.upload(file,sendDanmakuM1Vo.getRequestId());
+        String originalFilename = file.getOriginalFilename();
+        String prefix=originalFilename.substring(originalFilename.lastIndexOf(".")+1);
+
+        List<Ass> danmakuList = new ArrayList<>();
+        boolean m1Flag = false;
+
+        //2、解析文件
+        if("lrc".equals(prefix)){
+            danmakuList = lrcToAssList(filePath);
+        }else if("ass".equals(prefix)){
+            danmakuList = danmakuList(filePath);
+        }else if("m1".equals(prefix)){
+            danmakuList = lrcToAssList(filePath);
+            m1Flag = true;
+        }else {
+            return Response.makeErrRsp("");
+        }
+
+        //3、初始化
+        danmakuService.initDanmakuM1(sendDanmakuM1Vo,danmakuList);
+        String color = sendDanmakuM1Vo.getColor().trim();
+        int sendMode = sendDanmakuM1Vo.getSendMode();
+        int startRow = 1;//开始行
+        int timesOffset = 0;
+        int firstDmOffset = 0;//时间偏移量
+        int danmakuSum = 0;//发送弹幕统计数
+        if(sendDanmakuM1Vo.getSendFirstDmOffset()!=null){
+            firstDmOffset =  sendDanmakuM1Vo.getSendFirstDmOffset()  ;
+            timesOffset = timesOffset + firstDmOffset;
+        }
+        if(sendDanmakuM1Vo.getSendStartDmRow() != null){
+            startRow = sendDanmakuM1Vo.getSendStartDmRow() ;
+        }
+        if(StringUtils.isNotBlank(sendDanmakuM1Vo.getSendFirstDmTime())){
+            String fdt = sendDanmakuM1Vo.getSendFirstDmTime();
+            int sendFirstDmTime = parseOffset(fdt); // 修改后第一句时间
+            int orgFirstDmTime = danmakuList.get(0).getStartTime(); // 原始第一句时间
+            timesOffset = timesOffset + sendFirstDmTime - orgFirstDmTime ; //时间偏移
+        }
+
+        int lrcCount = danmakuList.size();//弹幕次数
+
+        // 测试发送配置
+        if(sendMode == 0){
+            lrcCount = startRow + 2;   //弹幕次数【通过修改lrcCount可只发送3条】
+        }
+
+        List<BaseDanmaku> previewList = new ArrayList<>();
+        for (int j = startRow; j <= lrcCount; j++) {
+            Ass lrcDanmaku = danmakuList.get(j-1);
+            String content =lrcDanmaku.getContent();
+            int startTime = lrcDanmaku.getStartTime() + timesOffset;
+            color =  danmakuService.updateColor(color);   //微调颜色
+            sendDanmakuM1Vo.setColor(color);
+
+            BaseDanmaku baseDanmaku = new BaseDanmaku();
+            BeanUtils.copyProperties(sendDanmakuM1Vo,baseDanmaku);
+            baseDanmaku.setContent(content);
+            double dStartTime = (double)startTime;
+            baseDanmaku.setStartTime(String.valueOf(dStartTime/1000));
+
+            previewList.add(baseDanmaku);
+
+        }
+        // 插件预览用xml
+        String previewXmlStr = XmlUtil.previewSendXml(previewList);
+        String preStr = "let s=`"+ previewXmlStr.replace("\n","") +"`" + "\n";
+        preStr = preStr + "ldanmu=xml2danmu(s)"+ "\n";
+        preStr = preStr + "window.ldldanmu[window.ldldanmu.length-1].ldanmu=ldanmu";
+        System.out.println(preStr);
+
+        return Response.makeOKRsp(preStr);
+    }
+
+
+
+    @ApiOperation("预览发送高级弹幕歌词")
+    @PostMapping("/previewDanmakuM7")
+    public ResponseResult<Map<String,Object>> previewDanmakuM7(MultipartFile file,SendDanmakuM7Vo sendDanmakuM7Vo) throws Exception{
+        //1、处理文件
+        String filePath = this.fileService.upload(file,sendDanmakuM7Vo.getRequestId());
+        String originalFilename = file.getOriginalFilename();
+        String prefix=originalFilename.substring(originalFilename.lastIndexOf(".")+1);
+
+        List<Ass> danmakuList = new ArrayList<>();
+        boolean m1Flag = false;
+
+
+        int outOffset = 0;//lrc歌词用于处理句与句之间间隙时间
+        //2、解析文件
+        if("lrc".equals(prefix)){
+            danmakuList = lrcToAssList(filePath);
+            outOffset = sendDanmakuM7Vo.getLrcIntervalTime();//250为结尾提前250结束
+        }else if("ass".equals(prefix)){
+            danmakuList = danmakuList(filePath);
+        }else {
+            return Response.makeErrRsp("");
+        }
+
+        //3、初始化
+        danmakuService.initDanmakuM7(sendDanmakuM7Vo,danmakuList);
+        String color = sendDanmakuM7Vo.getColor().trim();
+        int sendMode = sendDanmakuM7Vo.getSendMode() ;
+
+
+        int startRow = 1;//开始行
+        int timesOffset = 0;
+        int firstDmOffset = 0;//时间偏移量
+        int danmakuSum = 0;//发送弹幕统计数
+        if(sendDanmakuM7Vo.getSendFirstDmOffset()!=null){
+            firstDmOffset =  sendDanmakuM7Vo.getSendFirstDmOffset()  ;
+            timesOffset = timesOffset + firstDmOffset;
+        }
+        if(sendDanmakuM7Vo.getSendStartDmRow() != null){
+            startRow = sendDanmakuM7Vo.getSendStartDmRow() ;
+        }
+        if(!sendDanmakuM7Vo.getSendFirstDmTime().isEmpty()){
+            String fdt = sendDanmakuM7Vo.getSendFirstDmTime();
+            int sendFirstDmTime = parseOffset(fdt); // 修改后第一句时间
+            int orgFirstDmTime = danmakuList.get(0).getStartTime(); // 原始第一句时间
+            timesOffset = timesOffset + sendFirstDmTime - orgFirstDmTime ; //时间偏移
+        }
+        // 预览信息
+        String preivewLog = "";
+        String configTxt = logService.configLog(sendDanmakuM7Vo);
+        String linesTxt = "";
+        int lrcCount = danmakuList.size();//弹幕次数
+
+        // 测试发送配置
+        if(sendMode == 0){
+            lrcCount = startRow;   //弹幕次数【通过修改lrcCount可只发送3条】
+        }
+
+
+        boolean inCheck = sendDanmakuM7Vo.getInChecked();
+        boolean outCheck = sendDanmakuM7Vo.getOutChecked();
+        if( !inCheck ){
+            sendDanmakuM7Vo.setInDuration(0.0);
+        }
+        if( !inCheck && !outCheck ){
+            sendDanmakuM7Vo.setOverlapTime(0);
+            System.out.println("重叠时间为0");
+        }
+
+        int randomTime = 0;
+        long startRecord = DateUtil.getNowDate().getTime();
+        List<BaseDanmaku> previewList = new ArrayList<>();
+        for (int j = startRow; j <= lrcCount; j++) {
+            //高级弹幕三段发送
+            for(int k = 0; k < 3; k++) {
+                if (!inCheck && k == 0) {//跳过淡入部分
+                    continue;
+                }
+                if (!outCheck && k == 2) {//跳过淡出部分
+                    continue;
+                }
+                Random random =new Random();
+                if(sendDanmakuM7Vo.getSendRandomTime() > 0){
+                    randomTime = random.nextInt(sendDanmakuM7Vo.getSendRandomTime());
+                }
+                int sleepTime = sendDanmakuM7Vo.getSendInterval() * 1000 + randomTime;
+
+
+                Ass lrcDanmaku = danmakuList.get(j-1);
+                String danmakuText = lrcDanmaku.getContent();
+                sendDanmakuM7Vo.setText(danmakuText);
+
+                String content = "";
+                int startTime = lrcDanmaku.getStartTime() + timesOffset;
+
+                if(k == 0){//淡入
+                    startTime = startTime;
+                    content = DanmakuUtil.wrapperInDanmaku(sendDanmakuM7Vo);
+                }else if(k == 2){//淡出
+                    startTime = startTime + lrcDanmaku.getSyl() - sendDanmakuM7Vo.getOverlapTime()  - outOffset ;
+                    content = DanmakuUtil.wrapperOutDanmaku(sendDanmakuM7Vo);
+                } else {
+                    double stage1ltDouble = sendDanmakuM7Vo.getInDuration() *1000;
+                    startTime = startTime + (int)stage1ltDouble - sendDanmakuM7Vo.getOverlapTime() ;
+                    double sylStr = (lrcDanmaku.getSyl() - (int)stage1ltDouble +  sendDanmakuM7Vo.getOverlapTime()  - outOffset) * 0.001 ;
+                    sendDanmakuM7Vo.setDuration(sylStr);
+                    content = DanmakuUtil.wrapperDanmaku(sendDanmakuM7Vo);
+
+                }
+                color = danmakuService.updateColor(color);   //微调颜色
+                sendDanmakuM7Vo.setColor(color);
+
+                BaseDanmaku baseDanmaku = new BaseDanmaku();
+                BeanUtils.copyProperties(sendDanmakuM7Vo,baseDanmaku);
+                baseDanmaku.setContent(content);
+                double dStartTime = (double)startTime;
+                baseDanmaku.setStartTime(String.valueOf(dStartTime/1000));
+
+                previewList.add(baseDanmaku);
+            }
+
+        }
+//        System.out.println(XmlUtil.previewSendXml(previewList));
+        // 插件预览用xml
+        String previewXmlStr = XmlUtil.previewSendXml(previewList);
+        String preStr = "let s=`"+ previewXmlStr.replace("\n","") +"`" + "\n";
+        preStr = preStr + "ldanmu=xml2danmu(s)"+ "\n";
+        preStr = preStr + "window.ldldanmu[window.ldldanmu.length-1].ldanmu=ldanmu";
+        System.out.println(preStr);
+
+        return Response.makeOKRsp(preStr);
+    }
 
 }

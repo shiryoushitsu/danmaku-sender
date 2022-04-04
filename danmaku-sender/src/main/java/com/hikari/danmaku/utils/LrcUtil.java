@@ -451,7 +451,7 @@ public class LrcUtil {
         //Dialogue: 0,0:00:19.22,0:00:20.78,K2,,0,0,0,karaoke,
         //Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         Matcher lineMatcher = Pattern.
-                compile("Dialogue:(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*)").matcher(s);
+                compile("Dialogue:(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?)").matcher(s);
         // 如果没有，返回null
         if (!lineMatcher.matches()) {
             return null;
