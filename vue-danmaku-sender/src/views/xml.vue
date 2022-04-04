@@ -93,6 +93,9 @@
          <el-col :span="5"> 
           <el-button @click="stopSendDanmaku()">停止发送</el-button> 
          </el-col> 
+        <el-col :span="5"> 
+          <el-button @click="submitVideoPreviewForm()">预览代码</el-button> 
+         </el-col> 
         </el-row> 
 
     </el-tab-pane>
@@ -344,6 +347,39 @@ export default {
         }
       }
       param.set("sendMode",-1) // 预览信息
+      this.createCode();
+      param.append('requestId',"p" + this.requestId) // 每次请求创建一个随机Id
+      let config = {
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8' }
+      }
+      this.axios.post('/danmaku/sendDanmakuXml', param, config).then(res => {
+        debugger
+        if(res.data.code == 200){
+            this.textarea = res.data.msg
+        }
+      }).catch(function (error) {
+        console.log(error);
+      });
+    },
+
+    // 预览信息
+    submitVideoPreviewForm(){
+       if (this.txtFile == null) {
+        this.$message({
+          message: '请先上传文件!',
+          type: 'warning'
+        })
+        return
+      }
+      this.textarea = ''
+      let param = new FormData()
+      param.append('file', this.txtFile)
+      for(let key in this.form){
+        if(this.form[key] != null){
+          param.append(key,this.form[key])
+        }
+      }
+      param.set("sendMode",-2) // 预览信息
       this.createCode();
       param.append('requestId',"p" + this.requestId) // 每次请求创建一个随机Id
       let config = {
