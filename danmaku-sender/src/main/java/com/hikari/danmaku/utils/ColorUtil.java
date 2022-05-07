@@ -126,6 +126,9 @@ public class ColorUtil {
     //16进制转10进制
     public static  String hexto10(String hex_num) {
         String c10 = "16777215";
+        if(hex_num == null) {
+            return c10;
+        }
         long dec_num = Long.parseLong(hex_num, 16);
         c10 = String.valueOf(dec_num);
         if("0".equals(c10)){

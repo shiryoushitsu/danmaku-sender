@@ -1,11 +1,7 @@
 package com.hikari.danmaku.utils;
 
-import com.hikari.danmaku.constants.Mode;
-import com.hikari.danmaku.entity.AviutlExo;
 import com.hikari.danmaku.entity.BaseDanmaku;
 import com.hikari.danmaku.entity.SeniorDanmaku;
-import com.hikari.danmaku.entity.XmlEffect;
-import com.hikari.danmaku.vo.SendDanmakuM1Vo;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
@@ -17,8 +13,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import static com.hikari.danmaku.utils.CommonUtil.df3m7;
 
 public class XmlUtil {
     public static void main(String[] args) throws Exception {

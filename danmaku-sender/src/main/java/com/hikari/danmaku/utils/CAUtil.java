@@ -1,28 +1,10 @@
 package com.hikari.danmaku.utils;
 
 import cn.hutool.core.io.file.FileReader;
-import cn.hutool.core.io.file.FileWriter;
-
 import cn.hutool.json.JSONArray;
-import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
-
-import com.hikari.danmaku.entity.Ass;
-import com.hikari.danmaku.entity.AviutlExo;
-import com.hikari.danmaku.entity.Lyric;
-import com.hikari.danmaku.entity.XmlEffect;
-import org.apache.commons.io.FileUtils;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import static com.hikari.danmaku.utils.CommonUtil.df3m7;
 import static com.hikari.danmaku.utils.ExoUtil.writeStringToFile;
 
 /**

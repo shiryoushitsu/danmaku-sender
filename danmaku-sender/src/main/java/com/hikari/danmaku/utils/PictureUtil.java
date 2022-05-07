@@ -1,6 +1,5 @@
 package com.hikari.danmaku.utils;
 
-
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -10,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.hikari.danmaku.utils.ColorUtil.convertRGBToHex;
-
 
 //import org.bukkit.Material;
 //import org.bukkit.World;

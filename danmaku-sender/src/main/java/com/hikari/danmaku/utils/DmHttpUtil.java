@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.hikari.danmaku.common.Response;
 import com.hikari.danmaku.common.ResponseResult;
-import com.hikari.danmaku.vo.SendDanmakuM1Vo;
 import com.hikari.danmaku.vo.SendDanmakuVo;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.NameValuePair;

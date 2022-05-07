@@ -3,21 +3,12 @@ package com.hikari.danmaku.utils;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
-import com.alibaba.fastjson.JSON;
-import cn.hutool.json.XML.*;
-import com.hikari.danmaku.entity.BaseDanmaku;
-import com.hikari.danmaku.entity.Danmaku;
-import com.hikari.danmaku.entity.Position;
 import com.hikari.danmaku.entity.SeniorDanmaku;
 
-
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import static cn.hutool.json.XML.toJSONObject;
-
 
 public class TestUtil {
     public static void main(String[] args) {
@@ -29,9 +20,6 @@ public class TestUtil {
         }
 
     }
-
-
-
 
     /**
      *

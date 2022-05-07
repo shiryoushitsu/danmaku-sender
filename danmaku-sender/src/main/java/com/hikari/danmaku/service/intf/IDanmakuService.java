@@ -8,7 +8,6 @@ import com.hikari.danmaku.vo.SendDanmakuM7Vo;
 import java.util.List;
 import java.util.Map;
 
-
 public interface IDanmakuService {
 
     void initDanmakuM1(SendDanmakuM1Vo sendDanmakuM1Vo, List<Ass> danmakuList) throws Exception;

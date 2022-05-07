@@ -1,6 +1,5 @@
 package com.hikari.danmaku.utils;
 
-
 import cn.hutool.core.util.NumberUtil;
 import com.hikari.danmaku.constants.Easing;
 import com.hikari.danmaku.entity.*;
@@ -20,9 +19,7 @@ public class ExoUtil {
 
     // 15寸 760 510  38.8% / 14寸 850 560 43.4% /1px约等于0.002百分比
     public static void main(String[] args) {
-//        String fileName = "宝马2";
-        String fileName = "神一样全";
-//        String fileName = "hello闪字";
+        String fileName = "涂黑弹幕";
         String inputExoPath = "C:\\Users\\hikari\\Desktop\\"+  fileName+ ".exo";
         String outputXmlPath = "C:\\Users\\hikari\\Desktop\\"+ fileName +".xml";
 
@@ -33,7 +30,7 @@ public class ExoUtil {
         XmlEffect.setIsAdvanceStartTime(false);
         XmlEffect.setIsDelayEndTime(true); //结束延迟50ms
         XmlEffect.setIsForceLine(false);//是否换行都转成新文本
-        XmlEffect.setIsPercentage(true);//是否百分比
+        XmlEffect.setIsPercentage(false);//是否百分比
         XmlEffect.setIsColor10(false);
 
         XmlEffect.setIsPointCut(false); // 中间点强制分句
@@ -539,7 +536,7 @@ public class ExoUtil {
                 if(currentXmlEffect.getIsColor10()){
                     exoBean.setColor(ColorUtil.hexto10(exoBean.getColor()));
                 }
-
+                System.out.println(i);
                 if(exoBean.getText()!= null && (exoBean.getText().contains("<") || exoBean.getText().contains(">"))  || exoBean.getText().contains("\\")){
                     String text = exoBean.getText();
                     text = text.replace("<","&lt;");

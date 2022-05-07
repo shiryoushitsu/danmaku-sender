@@ -3,8 +3,6 @@ package com.hikari.danmaku.utils;
 import cn.hutool.core.util.NumberUtil;
 import com.hikari.danmaku.entity.CubicBezier;
 import com.hikari.danmaku.entity.Position;
-import com.hikari.danmaku.entity.Vector;
-import org.omg.PortableInterceptor.INACTIVE;
 
 import java.util.*;
 import java.util.regex.Matcher;

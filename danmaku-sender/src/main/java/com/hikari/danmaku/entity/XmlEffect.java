@@ -3,7 +3,6 @@ package com.hikari.danmaku.entity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.Getter;
 
 @ApiModel("EXO转换XML全局基本效果")
 @Data

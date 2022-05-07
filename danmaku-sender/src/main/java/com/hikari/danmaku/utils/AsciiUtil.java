@@ -1,8 +1,6 @@
 package com.hikari.danmaku.utils;
 
-
 import cn.hutool.core.io.file.FileReader;
-import cn.hutool.core.io.file.FileWriter;
 import com.hikari.danmaku.entity.FontFamily;
 
 import javax.imageio.ImageIO;
@@ -15,7 +13,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.hikari.danmaku.utils.ColorUtil.convertRGBToHex;
-
 
 public class AsciiUtil {
     public static void main(String []args) {

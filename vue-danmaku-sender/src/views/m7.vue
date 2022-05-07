@@ -157,7 +157,7 @@
                  <el-row>
                     <el-col :span="12">
                             <el-form-item size="small" label="透明度变化" prop="alpha" label-width="100px">
-                                <el-input v-model="form.alpha"  placeholder="格式：百分比-百分比" maxlength="3" />
+                                <el-input v-model="form.alpha"  placeholder="格式：百分比-百分比" />
                
                             </el-form-item>
                     </el-col>
