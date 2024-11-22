@@ -146,4 +146,7 @@ public class AviutlExo {
     @ApiModelProperty("全局基本效果")
     private XmlEffect xmlEffect;
 
+
+    @ApiModelProperty("多重描边效果")
+    private List<AulOutline> multiAulOutline;
 }

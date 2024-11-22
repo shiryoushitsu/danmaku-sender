@@ -299,9 +299,39 @@ public class ExoUtil {
 
         //描边处理
         for(int o = 0;o < partExoList.size(); o++){
-            AulOutline aulOutline = partExoList.get(o).getAulOutline();
+            AviutlExo mbExo = partExoList.get(o);
+            AulOutline aulOutline = mbExo.getAulOutline();
             Optional<AulOutline> outlineOpt = Optional.ofNullable(aulOutline);
-            if (outlineOpt.isPresent()) {
+
+            // 多重描边
+            List<AulOutline>  multi =  mbExo.getMultiAulOutline();
+            if(multi != null && multi.size() > 1){
+                for(int m = 0;m < multi.size(); m++){
+                    AulOutline mo = multi.get(m);
+                    int moutlineSize = mo.getOutlineSize();
+                    String moutlineAlpha = mo.getOutlineAlpha();
+                    String moutlineColor = mo.getOutlineColor();
+                    List<Position> msimpleInterval = normalInterval(moutlineSize);
+                    for(Position ppp : msimpleInterval){
+                        AviutlExo outlineTextExo = new AviutlExo();
+                        BeanUtils.copyProperties(mbExo, outlineTextExo);
+                        outlineTextExo.setStartX(outlineTextExo.getStartX() + (int)ppp.getX());
+                        outlineTextExo.setEndX(outlineTextExo.getEndX() + (int)ppp.getX());
+                        outlineTextExo.setX(outlineTextExo.getX() + (int)ppp.getX());
+
+                        outlineTextExo.setStartY(outlineTextExo.getStartY() + (int)ppp.getY());
+                        outlineTextExo.setEndY(outlineTextExo.getEndY() + (int)ppp.getY());
+                        outlineTextExo.setY(outlineTextExo.getY() + (int)ppp.getY());
+
+                        outlineTextExo.setAlpha(moutlineAlpha);
+                        outlineTextExo.setColor(moutlineColor);
+                        outlineTextExo.setAulOutline(null);
+                        outlineTextExo.setMultiAulOutline(null);
+                        outlineTextExo.setStartTime(partExoList.get(o).getStartTime() - 0.001 * (m+1));
+                        partExoList.add(outlineTextExo);
+                    }
+                }
+            }else if (outlineOpt.isPresent() ) {
                 int outlineSize = outlineOpt.get().getOutlineSize();
                 String outlineAlpha = outlineOpt.get().getOutlineAlpha();
                 String outlineColor = outlineOpt.get().getOutlineColor();
@@ -330,6 +360,11 @@ public class ExoUtil {
                 }
                 partExoList.get(o).setStartTime(partExoList.get(o).getStartTime() + 0.001);
             }
+
+
+
+
+
         }
 
 
@@ -874,6 +909,16 @@ public class ExoUtil {
                     break;
                 case "color":
                     aOutline.setOutlineColor(value);
+                    aOutline.setIsFinal("1");
+
+                    List<AulOutline> multiAulOutline = exoBean.getMultiAulOutline();
+                    if(exoBean.getMultiAulOutline() == null){
+                        multiAulOutline = new ArrayList<>();
+                    }
+                    AulOutline  newAulOutline = new AulOutline();
+                    BeanUtils.copyProperties(aOutline,newAulOutline);
+                    multiAulOutline.add(newAulOutline);
+                    exoBean.setMultiAulOutline(multiAulOutline);
                     break;
             }
             exoBean.setAulOutline(aOutline);

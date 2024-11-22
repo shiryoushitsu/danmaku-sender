@@ -20,4 +20,5 @@ public class AulOutline {
     @ApiModelProperty("描边颜色")
     private String outlineColor;
 
+    private String isFinal;
 }

@@ -24,10 +24,10 @@ import static com.hikari.danmaku.utils.CommonUtil.codeString;
 
 public class LrcUtil {
     public static void main(String []args) {
-        String s ="Sat Jan 01 2000 00:00:05 GMT+0800 (中国标准时间)";
+
 //         String s ="00:00:03 35345354";
 //        System.out.println(parseOffset("2 00:00:03 2"));
-        System.out.println(parseOffset(s));
+        System.out.println(parseAssLine("Dialogue: 0,1:10:00.00,2:10:00.00,K2,,0,0,0,karaoke,"));
 
     }
 
@@ -464,20 +464,25 @@ public class LrcUtil {
         String text = lineMatcher.group(10);
 
         Ass Ass = new Ass();
+
+        String hour =StartTimes.substring(0,1);
+        String minuteTen =StartTimes.substring(2,3);
         String minute =StartTimes.substring(3,4);
         String secondTens =StartTimes.substring(5,6);
         String secondOnes =StartTimes.substring(6,7);
         String millisecondThou =StartTimes.substring(8,9);
         String millisecondHun =StartTimes.substring(9,10);
 
+        String hourEnd = endTimes.substring(0,1);
+        String minuteTenEnd = endTimes.substring(2,3);
         String minuteEnd = endTimes.substring(3,4);
         String secondTensEnd = endTimes.substring(5,6);
         String secondOnesEnd = endTimes.substring(6,7);
         String millisecondThouEnd = endTimes.substring(8,9);
         String millisecondHunEnd = endTimes.substring(9,10);
 
-        int startTimems = Integer.parseInt(minute)*1000*60  + Integer.parseInt(secondTens)*10000 +  Integer.parseInt(secondOnes)*1000  + Integer.parseInt(millisecondThou)*100 + Integer.parseInt(millisecondHun)*10 ;
-        int endTimems = Integer.parseInt(minuteEnd)*1000*60  + Integer.parseInt(secondTensEnd)*10000 +  Integer.parseInt(secondOnesEnd)*1000  + Integer.parseInt(millisecondThouEnd)*100 + Integer.parseInt(millisecondHunEnd)*10 ;
+        int startTimems = Integer.parseInt(hour)*1000*60*60  +  Integer.parseInt(minuteTen)*10000*60  +  Integer.parseInt(minute)*1000*60  + Integer.parseInt(secondTens)*10000 +  Integer.parseInt(secondOnes)*1000  + Integer.parseInt(millisecondThou)*100 + Integer.parseInt(millisecondHun)*10 ;
+        int endTimems = Integer.parseInt(hourEnd)*1000*60*60  +  Integer.parseInt(minuteTenEnd)*10000*60  + Integer.parseInt(minuteEnd)*1000*60  + Integer.parseInt(secondTensEnd)*10000 +  Integer.parseInt(secondOnesEnd)*1000  + Integer.parseInt(millisecondThouEnd)*100 + Integer.parseInt(millisecondHunEnd)*10 ;
         int sylms=endTimems -startTimems;
 
 
