@@ -667,8 +667,8 @@ public class DanmakuController {
 
             int startTime = Integer.valueOf(xmlDanmaku.getStartTime()) + timesOffset;
 
-            if(danmakuSum > 2000){
-                writer.append("───────────────发送弹幕已超2000条───────────────\n");
+            if(danmakuSum > 20000){
+                writer.append("───────────────发送弹幕已超20000条───────────────\n");
                 writer.append("─────────────────────停止─────────────────────");
                 return Response.makeOKRsp(fileService.getFileLog(fileLogPath));
             }
